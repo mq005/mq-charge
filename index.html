@@ -2,522 +2,416 @@
 
 <html lang="az">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>MQ Charge — EV Şarj Stansiyası</title>
-  <meta name="description" content="GB/T AC dəstəkli elektrik avtomobil şarj sistemi" />
-  <meta name="theme-color" content="#1e293b" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body, #root { height: 100%; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-    button { font-family: inherit; }
-    input { font-family: inherit; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>MQ Charge</title>
+<meta name="theme-color" content="#1e293b"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+.app{min-height:100vh;background:#f1f5f9;display:flex;flex-direction:column}
+.topbar{background:#1e293b;color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px}
+.logo-icon{font-size:20px;background:#6366f1;border-radius:7px;padding:3px 8px}
+.tarif-badge{font-size:11px;color:#94a3b8;background:#334155;padding:4px 8px;border-radius:6px}
+.theme-btn{background:none;border:none;font-size:18px;padding:0;color:#fff}
+.content{flex:1;padding:16px 14px 88px;overflow-y:auto}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #e2e8f0;display:flex;z-index:50;box-shadow:0 -2px 16px rgba(0,0,0,.1)}
+.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 0 8px;border:none;background:transparent;color:#94a3b8;border-top:2.5px solid transparent;font-size:10px;font-weight:500}
+.navbtn.active{color:#6366f1;border-top-color:#6366f1;font-weight:700}
+.navbtn .icon{font-size:18px}
+.card{background:#fff;border-radius:18px;padding:20px 16px;border:2px solid #6366f1;box-shadow:0 8px 32px rgba(99,102,241,.12);position:relative;overflow:hidden}
+.card-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#818cf8)}
+.info-box{margin-top:14px;background:#eef2ff;border-radius:12px;padding:11px 14px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#6366f1}
+.steps{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.step-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.step-dot{width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;transition:all .3s;flex-shrink:0}
+.step-dot.active{background:#6366f1;color:#fff;box-shadow:0 0 0 3px #c7d2fe}
+.step-dot.done{background:#6366f1;color:#fff}
+.step-label{font-size:9px;color:#94a3b8;white-space:nowrap}
+.step-label.active{color:#6366f1;font-weight:700}
+.step-line{width:28px;height:2px;background:#e2e8f0;margin-bottom:18px;flex-shrink:0;transition:background .3s}
+.step-line.done{background:#6366f1}
+.section-title{font-size:17px;font-weight:800;color:#6366f1;text-align:center;margin-bottom:8px}
+.section-desc{color:#64748b;font-size:13px;text-align:center;margin-bottom:14px}
+.amt-label{text-align:center;font-size:12px;color:#94a3b8;margin-bottom:8px}
+.amt-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
+.amt-display{font-size:34px;font-weight:900;color:#1e293b;min-width:56px;text-align:center}
+.adj-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;font-size:22px;color:#475569;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.chip{padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#475569;min-width:60px}
+.chip.sel{border:2px solid #6366f1;background:#eef2ff;color:#6366f1}
+.pay-label{font-size:12px;color:#94a3b8;margin-bottom:8px}
+.pay-methods{display:flex;gap:8px;margin-bottom:10px}
+.pay-btn{flex:1;padding:11px 8px;border-radius:10px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#475569}
+.pay-btn.sel{border:2px solid #6366f1;background:#eef2ff;color:#6366f1}
+.card-input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:15px;outline:none;letter-spacing:2px;font-family:monospace;margin-bottom:10px}
+.iban-box{background:#f8fafc;border-radius:10px;padding:10px 14px;font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.8}
+.dep-note{background:#eef2ff;border-radius:10px;padding:10px 14px;font-size:12px;color:#6366f1;display:flex;gap:8px;margin-bottom:14px}
+.pbtn{background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;border-radius:13px;padding:15px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(99,102,241,.25);width:100%;margin-bottom:8px}
+.pbtn:disabled{background:#a5b4fc;cursor:default}
+.pbtn.red{background:#ef4444;box-shadow:0 4px 20px rgba(239,68,68,.18)}
+.pbtn.outline{background:#fff;color:#475569;border:1.5px solid #e2e8f0;box-shadow:none}
+.gauge-wrap{position:relative;width:180px;height:180px;margin:0 auto 14px}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-val{font-size:30px;font-weight:900;color:#1e293b;line-height:1}
+.gauge-unit{font-size:13px;color:#64748b;font-weight:600}
+.gauge-status{margin-top:5px;font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 10px;border-radius:20px;font-weight:700}
+.stat-row{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:10px;padding:11px 14px;margin-bottom:8px}
+.stat-label{font-size:13px;color:#64748b}
+.stat-val{font-weight:700;color:#1e293b;font-size:14px}
+.result-icon{width:56px;height:56px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 6px}
+.result-ok{color:#16a34a;font-weight:800;font-size:15px;text-align:center;margin-bottom:14px}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.result-label{font-size:13px;color:#64748b;max-width:60%}
+.result-val{font-weight:700;font-size:14px}
+.sess-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.sess-id{font-weight:700;color:#1e293b}
+.sess-meta{font-size:12px;color:#94a3b8;margin-top:2px}
+.sess-kwh{font-weight:800;color:#6366f1;text-align:right}
+.sess-cost{font-size:13px;color:#64748b}
+.empty-state{text-align:center;color:#94a3b8;padding:40px;background:#fff;border-radius:14px;border:1px solid #e2e8f0}
+.tariff-card{background:#fff;border-radius:14px;padding:18px 16px;margin-bottom:12px;border:1px solid #e2e8f0}
+.tariff-rate{font-size:26px;font-weight:900}
+.tariff-desc{color:#64748b;margin-top:4px;font-size:14px}
+.station-card{background:#fff;border-radius:14px;padding:18px 16px;border:1px solid #e2e8f0}
+.station-header{display:flex;justify-content:space-between;align-items:flex-start}
+.station-name{font-weight:800;color:#1e293b;font-size:16px}
+.station-addr{color:#64748b;font-size:13px;margin-top:3px}
+.active-badge{background:#dcfce7;color:#16a34a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
+.station-specs{margin-top:12px;font-size:13px;color:#64748b}
+.about-card{background:#fff;border-radius:14px;padding:18px 16px;border:1px solid #e2e8f0;color:#64748b;font-size:14px;line-height:1.8}
+.page-title{font-size:18px;font-weight:800;color:#1e293b;margin-bottom:14px}
+/* dark */
+.dark .app{background:#0f172a}
+.dark .bottomnav{background:#1e293b;border-top-color:#334155}
+.dark .navbtn{color:#64748b}
+.dark .navbtn.active{color:#6366f1}
+.dark .card,.dark .sess-card,.dark .tariff-card,.dark .station-card,.dark .about-card,.dark .empty-state{background:#1e293b;border-color:#334155}
+.dark .page-title,.dark .sess-id,.dark .station-name{color:#f1f5f9}
+.dark .stat-row{background:#0f172a}
+.dark .stat-val,.dark .gauge-val,.dark .amt-display{color:#f1f5f9}
+.dark .chip{background:#1e293b;border-color:#334155;color:#94a3b8}
+.dark .chip.sel{background:#1e1b4b;border-color:#6366f1;color:#6366f1}
+.dark .adj-btn,.dark .pay-btn{background:#1e293b;border-color:#334155;color:#94a3b8}
+.dark .pay-btn.sel{background:#1e1b4b;border-color:#6366f1;color:#6366f1}
+.dark .card-input,.dark .iban-box{background:#0f172a;color:#f1f5f9;border-color:#334155}
+.dark .result-row{border-bottom-color:#334155}
+.dark .sess-cost,.dark .tariff-desc,.dark .station-addr,.dark .station-specs{color:#94a3b8}
+/* desktop */
+@media(min-width:768px){
+  .app{flex-direction:row}
+  .topbar,.bottomnav{display:none}
+  .content{padding:24px 28px 20px}
+  .sidebar{width:220px;background:#1e293b;color:#fff;display:flex;flex-direction:column;padding:0 0 20px;flex-shrink:0;position:sticky;top:0;height:100vh}
+  .sb-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155;font-weight:800;font-size:16px}
+  .sb-logo-icon{font-size:22px;background:#6366f1;border-radius:8px;padding:4px 8px}
+  .sb-nav{padding:12px 8px;flex:1}
+  .sb-btn{width:100%;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:14px;font-weight:500;margin-bottom:4px;transition:all .2s;text-align:left}
+  .sb-btn.active{background:#6366f1;color:#fff;font-weight:700}
+  .sb-demo{margin:0 12px;background:#334155;border-radius:12px;padding:12px 14px}
+  .sb-demo-title{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:700;font-size:13px}
+  .sb-demo-txt{font-size:12px;color:#94a3b8;line-height:1.5}
+  .desktop-main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .dsk-header{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between}
+  .demo-badge{background:#eef2ff;color:#6366f1;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700}
+  .hdr-right{display:flex;align-items:center;gap:16px}
+  .hdr-tarif{font-size:14px;color:#64748b}
+  .lang-badge{background:#f1f5f9;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;color:#475569}
+  .dsk-footer{text-align:center;padding:12px;color:#94a3b8;font-size:12px;border-top:1px solid #e2e8f0;background:#fff}
+  .dark .dsk-header,.dark .dsk-footer{background:#1e293b;border-color:#334155}
+  .dark .lang-badge{background:#334155;color:#94a3b8}
+  .dark .hdr-tarif{color:#94a3b8}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .gcrd{background:#fff;border-radius:18px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.04);border:1.5px solid #e2e8f0;transition:all .3s;position:relative;overflow:hidden}
+  .gcrd.act{box-shadow:0 8px 32px rgba(99,102,241,.12);border:2px solid #6366f1}
+  .gcrd.dim{opacity:.5}
+  .dark .gcrd{background:#1e293b;border-color:#334155}
+  .ph{text-align:center;color:#94a3b8;padding:24px 16px}
+  .ph-icon{font-size:28px;margin-bottom:8px}
+  .ph-title{font-weight:700;color:#6366f1;font-size:14px}
+  .demo-info{margin-top:20px;background:#eef2ff;border-radius:14px;padding:14px 18px;display:flex;gap:10px}
+  .di-title{font-weight:700;color:#6366f1;font-size:14px}
+  .di-text{color:#64748b;font-size:13px;margin-top:4px}
+  .step-dot{width:36px;height:36px;font-size:14px}
+  .step-label{font-size:11px}
+  .step-line{width:60px}
+  .card{border:2px solid #6366f1}
+}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+<div id="app"></div>
+<script>
+var T=0.30, SID="AZE-001";
+var NAVS=[{id:"new",ic:"⚡",lb:"Sessiya"},{id:"sessions",ic:"📋",lb:"Tarixçə"},{id:"tariffs",ic:"💰",lb:"Tariflər"},{id:"stations",ic:"🗺️",lb:"Stansiya"},{id:"about",ic:"ℹ️",lb:"Haqqında"}];
+var S={nav:"new",step:1,dep:0,fkwh:0,sessions:[],theme:"light",amt:10,pm:"card",cn:"",busy:false,el:0,kwh:0,iv:null};
+var mob=window.innerWidth<768;
+window.addEventListener("resize",function(){mob=window.innerWidth<768;R();});
 
-```
-const TARIFF = 0.30;
-const STATION_ID = "AZE-001";
-const NAV_ITEMS = [
-  { id: "new",      icon: "⚡", label: "Sessiya"  },
-  { id: "sessions", icon: "📋", label: "Tarixçə"  },
-  { id: "tariffs",  icon: "💰", label: "Tariflər" },
-  { id: "stations", icon: "🗺️", label: "Stansiya"},
-  { id: "about",    icon: "ℹ️", label: "Haqqında"},
-];
+function h(tag,cls,ch,st){
+var e=document.createElement(tag);
+if(cls)e.className=cls;
+if(st)Object.assign(e.style,st);
+if(ch){if(!Array.isArray(ch))ch=[ch];ch.forEach(function(c){if(c==null||c===false)return;if(typeof c===“string”||typeof c===“number”)e.appendChild(document.createTextNode(String(c)));else e.appendChild(c);})}
+return e;
+}
+function d(cls,ch,st){return h(“div”,cls,ch,st);}
+function btn(cls,txt,fn,dis){var b=h(“button”,cls,[txt]);if(fn)b.addEventListener(“click”,fn);if(dis)b.disabled=true;return b;}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,“0”)+”:”+String(s%60).padStart(2,“0”);}
 
-function useWidth() {
-  const [w, setW] = useState(window.innerWidth);
-  useEffect(() => {
-    const h = () => setW(window.innerWidth);
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []);
-  return w;
+function set(p){Object.assign(S,p);R();}
+
+function buildGauge(pct,val,unit,status){
+var r=72,c=2*Math.PI*r,dash=c*Math.min(pct,100)/100;
+var col=pct<40?”#22c55e”:pct<75?”#f59e0b”:”#ef4444”;
+var ns=“http://www.w3.org/2000/svg”;
+var wrap=d(“gauge-wrap”);
+var svg=document.createElementNS(ns,“svg”);
+svg.setAttribute(“width”,“180”);svg.setAttribute(“height”,“180”);svg.style.transform=“rotate(-90deg)”;
+function circ(stroke,sw,da){var el=document.createElementNS(ns,“circle”);el.setAttribute(“cx”,“90”);el.setAttribute(“cy”,“90”);el.setAttribute(“r”,String(r));el.setAttribute(“fill”,“none”);el.setAttribute(“stroke”,stroke);el.setAttribute(“stroke-width”,String(sw));if(da)el.setAttribute(“stroke-dasharray”,da);el.setAttribute(“stroke-linecap”,“round”);return el;}
+svg.appendChild(circ(”#e2e8f0”,11,null));
+var arc=circ(col,11,dash+” “+c);
+arc.style.transition=“stroke-dasharray 0.5s ease”;
+svg.appendChild(arc);
+wrap.appendChild(svg);
+wrap.appendChild(d(“gauge-center”,[d(””,[“⚡”],{fontSize:“16px”}),d(“gauge-val”,val),d(“gauge-unit”,unit),d(“gauge-status”,status)]));
+return wrap;
 }
 
-const pBtn = {
-  background: "linear-gradient(135deg,#6366f1,#818cf8)", color: "#fff",
-  border: "none", borderRadius: 13, padding: "15px", fontSize: 15, fontWeight: 700,
-  cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-  justifyContent: "center", boxShadow: "0 4px 20px #6366f140", width: "100%"
-};
-const sBtn = {
-  width: 44, height: 44, borderRadius: 10, border: "1.5px solid #e2e8f0",
-  background: "#fff", fontSize: 22, cursor: "pointer", color: "#475569",
-  display: "flex", alignItems: "center", justifyContent: "center",
-  fontWeight: 700, flexShrink: 0
-};
-
-/* ── Circular gauge ── */
-function Gauge({ pct, value, unit, status }) {
-  const r = 72, c = 2 * Math.PI * r;
-  const dash = c * Math.min(pct, 100) / 100;
-  const color = pct < 40 ? "#22c55e" : pct < 75 ? "#f59e0b" : "#ef4444";
-  return (
-    <div style={{ position: "relative", width: 180, height: 180, margin: "0 auto" }}>
-      <svg width="180" height="180" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx="90" cy="90" r={r} fill="none" stroke="#e2e8f0" strokeWidth="11"/>
-        <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="11"
-          strokeDasharray={`${dash} ${c}`} strokeLinecap="round"
-          style={{ transition: "stroke-dasharray 0.5s ease" }}/>
-      </svg>
-      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ fontSize: 16 }}>⚡</span>
-        <span style={{ fontSize: 30, fontWeight: 900, color: "#1e293b", lineHeight: 1 }}>{value}</span>
-        <span style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>{unit}</span>
-        <span style={{ marginTop: 5, fontSize: 11, background: "#dcfce7", color: "#16a34a", padding: "2px 10px", borderRadius: 20, fontWeight: 700 }}>{status}</span>
-      </div>
-    </div>
-  );
+function buildSteps(cur){
+var steps=[“QR”,“Depozit”,“Şarj”,“Nəticə”];
+var wrap=d(“steps”);
+steps.forEach(function(s,i){
+var n=i+1,act=n===cur,dn=n<cur;
+var col=d(“step-col”,[d(“step-dot”+(act?” active”:dn?” done”:””),dn?“✓”:String(n)),d(“step-label”+(act?” active”:””),s)]);
+wrap.appendChild(col);
+if(i<3){var ln=d(“step-line”+(dn?” done”:””));wrap.appendChild(ln);}
+});
+return wrap;
 }
 
-/* ── Step indicator ── */
-function Steps({ cur, mob }) {
-  const steps = ["QR", "Depozit", "Şarj", "Nəticə"];
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-      {steps.map((s, i) => {
-        const n = i+1, act = n===cur, dn = n<cur;
-        return (
-          <div key={s} style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-              <div style={{
-                width: mob?28:36, height: mob?28:36, borderRadius: "50%",
-                background: act||dn ? "#6366f1" : "#e2e8f0",
-                color: act||dn ? "#fff" : "#94a3b8",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 800, fontSize: mob?11:14,
-                boxShadow: act ? "0 0 0 3px #c7d2fe" : "none",
-                transition: "all 0.3s", flexShrink: 0
-              }}>{dn ? "✓" : n}</div>
-              <span style={{ fontSize: mob?9:11, color: act?"#6366f1":"#94a3b8", fontWeight: act?700:500, whiteSpace: "nowrap" }}>{s}</span>
-            </div>
-            {i < steps.length-1 && (
-              <div style={{ width: mob?28:60, height: 2, background: dn?"#6366f1":"#e2e8f0", marginBottom: 18, flexShrink: 0, transition: "background 0.3s" }}/>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+function buildQR(){
+var pat=[[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
+var ns=“http://www.w3.org/2000/svg”;
+var svg=document.createElementNS(ns,“svg”);
+svg.setAttribute(“width”,“150”);svg.setAttribute(“height”,“150”);svg.setAttribute(“viewBox”,“0 0 160 160”);
+for(var row=0;row<7;row++)for(var col=0;col<7;col++){var r=document.createElementNS(ns,“rect”);r.setAttribute(“x”,String(col*22+4));r.setAttribute(“y”,String(row*22+4));r.setAttribute(“width”,“20”);r.setAttribute(“height”,“20”);r.setAttribute(“fill”,pat[row][col]?”#1e293b”:”#f8fafc”);r.setAttribute(“rx”,“2”);svg.appendChild(r);}
+for(var i=0;i<100;i++){var rr=Math.floor(i/10),cc=i%10,x=cc*9+30,y=rr*9+30;if(x>25&&x<130&&y>25&&y<130&&!(x<60&&y<60)&&!(x>100&&y<60)&&!(x<60&&y>100)&&(rr*13+cc*7)%3===0){var sq=document.createElementNS(ns,“rect”);sq.setAttribute(“x”,String(x));sq.setAttribute(“y”,String(y));sq.setAttribute(“width”,“8”);sq.setAttribute(“height”,“8”);sq.setAttribute(“fill”,”#1e293b”);sq.setAttribute(“rx”,“1”);svg.appendChild(sq);}}
+var svgW=d(””,null,{border:“2px solid #6366f1”,borderRadius:“14px”,padding:“10px”,background:”#f8fafc”,display:“flex”,justifyContent:“center”,marginBottom:“14px”});
+svgW.appendChild(svg);
+var sIDel=d(””,null,{background:”#f1f5f9”,borderRadius:“8px”,padding:“7px 18px”,fontSize:“13px”,color:”#475569”,display:“flex”,justifyContent:“center”,marginBottom:“8px”});
+sIDel.innerHTML=“Stansiya ID: <strong style='color:#6366f1'>”+SID+”</strong>”;
+var wrap=d(””,null,{display:“flex”,flexDirection:“column”});
+wrap.appendChild(d(“section-title”,“1. QR Scan”));
+wrap.appendChild(d(“section-desc”,“Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.”));
+wrap.appendChild(svgW);
+wrap.appendChild(sIDel);
+wrap.appendChild(d(””,[“və ya”],{color:”#94a3b8”,fontSize:“12px”,textAlign:“center”,marginBottom:“8px”}));
+wrap.appendChild(btn(“pbtn”,“▶ Demo olaraq başla”,function(){set({step:2});}));
+return wrap;
 }
 
-/* ── QR Step ── */
-function QRStep({ onStart }) {
-  const pat = [[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0 }}>1. QR Scan</h2>
-      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.</p>
-      <div style={{ border: "2px solid #6366f1", borderRadius: 14, padding: 10, background: "#f8fafc", boxShadow: "0 4px 20px #6366f115" }}>
-        <svg width="150" height="150" viewBox="0 0 160 160">
-          {[0,1,2,3,4,5,6].map(row => [0,1,2,3,4,5,6].map(col =>
-            <rect key={`${row}-${col}`} x={col*22+4} y={row*22+4} width={20} height={20}
-              fill={pat[row][col]?"#1e293b":"#f8fafc"} rx={2}/>
-          ))}
-          {Array.from({length:100}).map((_,i) => {
-            const rr=Math.floor(i/10), cc=i%10, x=cc*9+30, y=rr*9+30;
-            if (x>25&&x<130&&y>25&&y<130&&!(x<60&&y<60)&&!(x>100&&y<60)&&!(x<60&&y>100))
-              if ((rr*13+cc*7)%3===0) return <rect key={i} x={x} y={y} width={8} height={8} fill="#1e293b" rx={1}/>;
-            return null;
-          })}
-        </svg>
-      </div>
-      <div style={{ background: "#f1f5f9", borderRadius: 8, padding: "7px 18px", fontSize: 13, color: "#475569" }}>
-        Stansiya ID: <strong style={{ color: "#6366f1" }}>{STATION_ID}</strong>
-      </div>
-      <p style={{ color: "#94a3b8", fontSize: 12 }}>və ya</p>
-      <button onClick={onStart} style={pBtn}>▶ Demo olaraq başla</button>
-    </div>
-  );
+function buildDeposit(){
+var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
+wrap.appendChild(d(“section-title”,“2. Depozit”));
+wrap.appendChild(d(“section-desc”,“Şarjə başlamaq üçün depozit məbləğini daxil edin.”));
+wrap.appendChild(d(“amt-label”,“Depozit məbləği (AZN)”));
+var disp=d(“amt-display”,String(S.amt));
+var minus=btn(“adj-btn”,“−”,function(){set({amt:Math.max(1,S.amt-1)});});
+var plus=btn(“adj-btn”,”+”,function(){set({amt:Math.min(500,S.amt+1)});});
+wrap.appendChild(d(“amt-row”,[minus,disp,plus]));
+var chips=d(“chips”);
+[5,10,20,50,100].forEach(function(a){chips.appendChild(btn(“chip”+(S.amt===a?” sel”:””),a+” AZN”,function(){set({amt:a});}));});
+wrap.appendChild(chips);
+wrap.appendChild(d(“pay-label”,“Ödəniş üsulu”));
+var pm=d(“pay-methods”);
+[[“card”,“💳 Bank Kartı”],[“transfer”,“🏦 Köçürmə”]].forEach(function(x){pm.appendChild(btn(“pay-btn”+(S.pm===x[0]?” sel”:””),x[1],function(){set({pm:x[0]});}));});
+wrap.appendChild(pm);
+if(S.pm===“card”){
+var inp=document.createElement(“input”);
+inp.className=“card-input”;inp.type=“text”;inp.placeholder=”**** **** **** ****”;inp.value=S.cn;
+inp.addEventListener(“input”,function(){S.cn=this.value.replace(/\D/g,””).slice(0,16);this.value=S.cn;});
+wrap.appendChild(inp);
+} else {
+var ib=d(“iban-box”);
+ib.innerHTML=“IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong><br>Təyinat: <strong>EV-”+SID+”</strong>”;
+wrap.appendChild(ib);
+}
+wrap.appendChild(d(“dep-note”,“ℹ️  Depozit bitərsə şarj avtomatik dayandırılacaq.”));
+var pb=btn(“pbtn”,S.busy?“🔄 Emal olunur…”:“🔒 Ödə və Başla”,function(){
+if(S.busy)return;
+set({busy:true});
+setTimeout(function(){set({busy:false,dep:S.amt,step:3});},1800);
+},S.busy);
+if(S.busy)pb.style.background=”#a5b4fc”;
+wrap.appendChild(pb);
+return wrap;
 }
 
-/* ── Deposit Step ── */
-const AMTS = [5, 10, 20, 50, 100];
-function DepositStep({ onPay }) {
-  const [amt, setAmt] = useState(10);
-  const [method, setMethod] = useState("card");
-  const [card, setCard] = useState("");
-  const [busy, setBusy] = useState(false);
-  const pay = async () => {
-    setBusy(true);
-    await new Promise(r => setTimeout(r, 1800));
-    setBusy(false); onPay(amt);
-  };
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>2. Depozit</h2>
-      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Şarjə başlamaq üçün depozit məbləğini daxil edin.</p>
-      <div>
-        <div style={{ textAlign: "center", fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>Depozit məbləği (AZN)</div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
-          <button onClick={() => setAmt(a => Math.max(1,a-1))} style={sBtn}>−</button>
-          <span style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", minWidth: 56, textAlign: "center" }}>{amt}</span>
-          <button onClick={() => setAmt(a => Math.min(500,a+1))} style={sBtn}>+</button>
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 10 }}>
-          {AMTS.map(a => (
-            <button key={a} onClick={() => setAmt(a)} style={{
-              padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
-              border: amt===a ? "2px solid #6366f1" : "1.5px solid #e2e8f0",
-              background: amt===a ? "#eef2ff" : "#fff", color: amt===a ? "#6366f1" : "#475569", minWidth: 60
-            }}>{a} AZN</button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>Ödəniş üsulu</div>
-        <div style={{ display: "flex", gap: 8 }}>
-          {[["card","💳 Bank Kartı"],["transfer","🏦 Köçürmə"]].map(([k,lbl]) => (
-            <button key={k} onClick={() => setMethod(k)} style={{
-              flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer",
-              border: method===k ? "2px solid #6366f1" : "1.5px solid #e2e8f0",
-              background: method===k ? "#eef2ff" : "#fff", color: method===k ? "#6366f1" : "#475569"
-            }}>{lbl}</button>
-          ))}
-        </div>
-        {method === "card" && (
-          <input value={card} onChange={e => setCard(e.target.value.replace(/\D/g,"").slice(0,16))}
-            placeholder="**** **** **** ****"
-            style={{ marginTop: 10, width: "100%", padding: "12px 14px", borderRadius: 10,
-              border: "1.5px solid #e2e8f0", fontSize: 15, outline: "none",
-              fontFamily: "monospace", letterSpacing: 2 }}/>
-        )}
-        {method === "transfer" && (
-          <div style={{ marginTop: 10, background: "#f8fafc", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#64748b" }}>
-            <div>IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong></div>
-            <div style={{ marginTop: 4 }}>Təyinat: <strong>EV-{STATION_ID}</strong></div>
-          </div>
-        )}
-      </div>
-      <div style={{ background: "#eef2ff", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#6366f1", display: "flex", gap: 8 }}>
-        <span>ℹ️</span><span>Depozit bitərsə şarj avtomatik dayandırılacaq.</span>
-      </div>
-      <button onClick={pay} disabled={busy}
-        style={{ ...pBtn, background: busy?"#a5b4fc":"linear-gradient(135deg,#6366f1,#818cf8)", cursor: busy?"default":"pointer" }}>
-        {busy ? "🔄 Emal olunur..." : "🔒 Ödə və Başla"}
-      </button>
-    </div>
-  );
+function startCharge(){
+if(S.iv)return;
+var iv=setInterval(function(){
+var mk=S.dep/T,nk=S.kwh+6.8/3600;
+if(nk>=mk){
+clearInterval(S.iv);var fk=Math.min(nk,mk);
+var fc=(fk*T).toFixed(2);
+set({iv:null,kwh:fk,el:S.el+1,step:4,fkwh:fk,
+sessions:[{id:“S-”+(S.sessions.length+1),date:new Date().toLocaleString(“az-AZ”),kwh:fk.toFixed(2),cost:fc,station:SID}].concat(S.sessions)});
+return;
+}
+S.kwh=nk;S.el++;
+var gv=document.querySelector(”.gauge-val”);
+var svs=document.querySelectorAll(”.stat-val”);
+if(gv)gv.textContent=nk.toFixed(2);
+if(svs.length>=3){svs[0].textContent=fmt(S.el);svs[2].textContent=(nk*T).toFixed(2)+” AZN”;}
+var mk2=S.dep/T,p=Math.min((nk/mk2)*100,100),r=72,c=2*Math.PI*r;
+var col=p<40?”#22c55e”:p<75?”#f59e0b”:”#ef4444”;
+var arc=document.querySelector(”.gauge-wrap circle:nth-child(2)”);
+if(arc){arc.setAttribute(“stroke-dasharray”,(c*p/100)+” “+c);arc.setAttribute(“stroke”,col);}
+},1000);
+S.iv=iv;
 }
 
-/* ── Charging Step ── */
-function ChargingStep({ deposit, onStop }) {
-  const [elapsed, setElapsed] = useState(0);
-  const [kwh, setKwh] = useState(0);
-  const pwr = 6.8, maxKwh = deposit / TARIFF;
-  const ref = useRef(null);
-  useEffect(() => {
-    ref.current = setInterval(() => {
-      setElapsed(e => e+1);
-      setKwh(k => {
-        const nx = k + pwr/3600;
-        if (nx >= maxKwh) { clearInterval(ref.current); onStop(Math.min(nx,maxKwh)); return Math.min(nx,maxKwh); }
-        return nx;
-      });
-    }, 1000);
-    return () => clearInterval(ref.current);
-  }, []);
-  const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-  const cost = (kwh*TARIFF).toFixed(2);
-  const pct = Math.min((kwh/maxKwh)*100,100);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>3. Şarj Prosesi</h2>
-      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Şarj prosesi aktivdir. Real-time məlumatları izləyin.</p>
-      <Gauge pct={pct} value={kwh.toFixed(2)} unit="kWh" status="Şarj aktivdir"/>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {[["🕐","Müddət",fmt(elapsed)],["⚡","Güc",`${pwr} kW`],["💰","Cari xərc",`${cost} AZN`]].map(([ic,lb,vl]) => (
-          <div key={lb} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f8fafc", borderRadius: 10, padding: "11px 14px" }}>
-            <span style={{ fontSize: 13, color: "#64748b" }}>{ic} {lb}</span>
-            <span style={{ fontWeight: 700, color: "#1e293b", fontSize: 14 }}>{vl}</span>
-          </div>
-        ))}
-      </div>
-      <button onClick={() => { clearInterval(ref.current); onStop(kwh); }}
-        style={{ ...pBtn, background: "#ef4444", boxShadow: "0 4px 20px #ef444430" }}>
-        ⏹ Şarjı Dayandır
-      </button>
-    </div>
-  );
+function buildCharging(){
+startCharge();
+var pct=Math.min((S.kwh/(S.dep/T))*100,100);
+var cost=(S.kwh*T).toFixed(2);
+var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
+wrap.appendChild(d(“section-title”,“3. Şarj Prosesi”));
+wrap.appendChild(d(“section-desc”,“Şarj prosesi aktivdir. Real-time məlumatları izləyin.”));
+wrap.appendChild(buildGauge(pct,S.kwh.toFixed(2),“kWh”,“Şarj aktivdir”));
+[[“🕐”,“Müddət”,fmt(S.el)],[“⚡”,“Güc”,“6.8 kW”],[“💰”,“Cari xərc”,cost+” AZN”]].forEach(function(row){
+wrap.appendChild(d(“stat-row”,[d(“stat-label”,row[0]+” “+row[1]),d(“stat-val”,row[2])]));
+});
+wrap.appendChild(btn(“pbtn red”,“⏹ Şarjı Dayandır”,function(){
+clearInterval(S.iv);var fc=(S.kwh*T).toFixed(2);
+set({iv:null,step:4,fkwh:S.kwh,
+sessions:[{id:“S-”+(S.sessions.length+1),date:new Date().toLocaleString(“az-AZ”),kwh:S.kwh.toFixed(2),cost:fc,station:SID}].concat(S.sessions)});
+}));
+return wrap;
 }
 
-/* ── Result Step ── */
-function ResultStep({ deposit, kwh, onNew, onSessions }) {
-  const cost = (kwh*TARIFF).toFixed(2);
-  const chg = (deposit - parseFloat(cost)).toFixed(2);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>4. Nəticə</h2>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>✅</div>
-        <span style={{ color: "#16a34a", fontWeight: 800, fontSize: 15 }}>Uğurlu şəkildə tamamlandı!</span>
-      </div>
-      {[["İstifadə olunan enerji",`${kwh.toFixed(2)} kWh`,"#1e293b"],
-        ["Ümumi xərc",`${cost} AZN`,"#1e293b"],
-        ["Depozit",`${deposit.toFixed(2)} AZN`,"#1e293b"],
-        ["Qalıq məbləğ (geri qaytarılacaq)",`${chg} AZN`,"#16a34a"]
-      ].map(([lb,vl,vc]) => (
-        <div key={lb} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f1f5f9" }}>
-          <span style={{ fontSize: 13, color: "#64748b", maxWidth: "60%" }}>{lb}</span>
-          <span style={{ fontWeight: 700, color: vc, fontSize: 14 }}>{vl}</span>
-        </div>
-      ))}
-      <button onClick={onNew} style={pBtn}>🔄 Yeni Sessiya</button>
-      <button onClick={onSessions} style={{ ...pBtn, background: "#fff", color: "#475569", border: "1.5px solid #e2e8f0", boxShadow: "none" }}>📋 Sessiyalarım</button>
-    </div>
-  );
+function buildResult(){
+var cost=(S.fkwh*T).toFixed(2),chg=(S.dep-parseFloat(cost)).toFixed(2);
+var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
+wrap.appendChild(d(“section-title”,“4. Nəticə”));
+wrap.appendChild(d(“result-icon”,“✅”));
+wrap.appendChild(d(“result-ok”,“Uğurlu şəkildə tamamlandı!”));
+[[“İstifadə olunan enerji”,S.fkwh.toFixed(2)+” kWh”,”#1e293b”],[“Ümumi xərc”,cost+” AZN”,”#1e293b”],[“Depozit”,S.dep.toFixed(2)+” AZN”,”#1e293b”],[“Qalıq məbləğ (geri qaytarılacaq)”,chg+” AZN”,”#16a34a”]].forEach(function(row){
+var rr=d(“result-row”,[d(“result-label”,row[0]),d(“result-val”,row[1])]);
+rr.querySelector(”.result-val”).style.color=row[2];
+wrap.appendChild(rr);
+});
+wrap.appendChild(btn(“pbtn”,“🔄 Yeni Sessiya”,function(){
+clearInterval(S.iv);set({nav:“new”,step:1,dep:0,fkwh:0,kwh:0,el:0,amt:10,pm:“card”,cn:””,busy:false,iv:null});
+}));
+wrap.appendChild(btn(“pbtn outline”,“📋 Sessiyalarım”,function(){set({nav:“sessions”});}));
+return wrap;
 }
 
-/* ── Placeholder ── */
-function Placeholder({ icon, title }) {
-  return (
-    <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 16px" }}>
-      <div style={{ fontSize: 28, marginBottom: 8 }}>{icon}</div>
-      <div style={{ fontWeight: 700, color: "#6366f1", fontSize: 14 }}>{title}</div>
-    </div>
-  );
+function buildPage(){
+if(S.nav===“sessions”){
+var pg=d(””,null);pg.appendChild(d(“page-title”,“Sessiyalarım”));
+if(!S.sessions.length)pg.appendChild(d(“empty-state”,“Hələ sessiya yoxdur.”));
+else S.sessions.forEach(function(s){pg.appendChild(d(“sess-card”,[d(””,[d(“sess-id”,s.id),d(“sess-meta”,s.date+” · “+s.station)]),d(””,[d(“sess-kwh”,s.kwh+” kWh”),d(“sess-cost”,s.cost+” AZN”)])]));});
+return pg;
+}
+if(S.nav===“tariffs”){
+var pg=d(””,null);pg.appendChild(d(“page-title”,“Tariflər”));
+[[“0.30 AZN/kWh”,“Standart gündüz tarifi (06:00–22:00)”,”#6366f1”],[“0.20 AZN/kWh”,“Gecə tarifi (22:00–06:00)”,”#818cf8”]].forEach(function(r){
+var c=d(“tariff-card”,[d(“tariff-rate”,r[0]),d(“tariff-desc”,r[1])]);c.querySelector(”.tariff-rate”).style.color=r[2];pg.appendChild(c);
+});
+return pg;
+}
+if(S.nav===“stations”){
+var pg=d(””,null);pg.appendChild(d(“page-title”,“Stansiyalar”));
+pg.appendChild(d(“station-card”,[d(“station-header”,[d(””,[d(“station-name”,SID),d(“station-addr”,“Bakı, Nərimanov r., AzərGold, 12”)]),d(“active-badge”,“Aktiv”)]),d(“station-specs”,“Güc: 7.2 kW · GB/T AC · 24/7”)]));
+return pg;
+}
+if(S.nav===“about”){
+var pg=d(””,null);pg.appendChild(d(“page-title”,“Haqqında”));
+var ab=d(“about-card”);ab.innerHTML=”<p style='margin-bottom:8px'>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p><p style='margin-bottom:8px'>Versiya: <strong style='color:#6366f1'>1.0.0</strong></p><p>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>”;
+pg.appendChild(ab);return pg;
+}
+// New session
+var pg=d(””,null);
+pg.appendChild(buildSteps(S.step));
+if(mob){
+var stepContent;
+if(S.step===1)stepContent=buildQR();
+else if(S.step===2)stepContent=buildDeposit();
+else if(S.step===3)stepContent=buildCharging();
+else stepContent=buildResult();
+var card=d(“card”,[d(“card-line”),stepContent]);
+pg.appendChild(card);
+pg.appendChild(d(“info-box”,“ℹ️  Demo: Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.”));
+} else {
+var grid=d(“grid4”);
+for(var s=1;s<=4;s++){
+var cls=“gcrd”+(S.step===s?” act”:S.step<s?” dim”:””);
+var gc=d(cls);
+if(S.step===s)gc.appendChild(d(“card-line”));
+if(s===1)gc.appendChild(buildQR());
+else if(s===2){if(S.step>=2)gc.appendChild(buildDeposit());else gc.appendChild(d(“ph”,[d(“ph-icon”,“💳”),d(“ph-title”,“2. Depozit”)]));}
+else if(s===3){if(S.step===3)gc.appendChild(buildCharging());else if(S.step>3)gc.appendChild(d(“ph”,[d(“ph-icon”,“✅”),d(“ph-title”,“Tamamlandı”)]));else gc.appendChild(d(“ph”,[d(“ph-icon”,“⚡”),d(“ph-title”,“3. Şarj Prosesi”)]));}
+else{if(S.step===4)gc.appendChild(buildResult());else gc.appendChild(d(“ph”,[d(“ph-icon”,“🏁”),d(“ph-title”,“4. Nəticə”)]));}
+grid.appendChild(gc);
+}
+pg.appendChild(grid);
+pg.appendChild(d(“demo-info”,[d(””,[“ℹ️”],{fontSize:“16px”}),d(””,[d(“di-title”,“Demo Versiya Haqqında”),d(“di-text”,“Bu sistem demo məqsədlidir. Bütün məlumatlar simulyasiya olunur.”)])]))
+}
+return pg;
 }
 
-/* ══════════════════════════════════════════
-   MAIN APP
-══════════════════════════════════════════ */
-function App() {
-  const width = useWidth();
-  const mob = width < 768;
-  const [nav, setNav] = useState("new");
-  const [step, setStep] = useState(1);
-  const [dep, setDep] = useState(0);
-  const [fKwh, setFKwh] = useState(0);
-  const [sessions, setSessions] = useState([]);
-  const [theme, setTheme] = useState("light");
-
-  const dk = theme === "dark";
-  const bg = dk ? "#0f172a" : "#f1f5f9";
-  const cBg = dk ? "#1e293b" : "#fff";
-  const tP = dk ? "#f1f5f9" : "#1e293b";
-  const tS = dk ? "#94a3b8" : "#64748b";
-  const bC = dk ? "#334155" : "#e2e8f0";
-
-  const stop = (kwh) => {
-    setSessions(p => [{ id:`S-${p.length+1}`, date: new Date().toLocaleString("az-AZ"), kwh: kwh.toFixed(2), cost: (kwh*TARIFF).toFixed(2), station: STATION_ID }, ...p]);
-    setFKwh(kwh); setStep(4);
-  };
-  const newSess = () => { setStep(1); setDep(0); setFKwh(0); setNav("new"); };
-  const go = id => { setNav(id); if (id==="new") newSess(); };
-
-  const Page = () => {
-    if (nav === "sessions") return (
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Sessiyalarım</h2>
-        {sessions.length === 0
-          ? <div style={{ textAlign: "center", color: tS, padding: 40, background: cBg, borderRadius: 14, border: `1px solid ${bC}` }}>Hələ sessiya yoxdur.</div>
-          : sessions.map(s => (
-            <div key={s.id} style={{ background: cBg, borderRadius: 14, padding: "14px 16px", marginBottom: 10, border: `1px solid ${bC}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontWeight: 700, color: tP }}>{s.id}</div>
-                <div style={{ fontSize: 12, color: tS, marginTop: 2 }}>{s.date} · {s.station}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontWeight: 800, color: "#6366f1" }}>{s.kwh} kWh</div>
-                <div style={{ fontSize: 13, color: tS }}>{s.cost} AZN</div>
-              </div>
-            </div>
-          ))
-        }
-      </div>
-    );
-    if (nav === "tariffs") return (
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Tariflər</h2>
-        {[["0.30 AZN/kWh","Standart gündüz tarifi (06:00–22:00)","#6366f1"],
-          ["0.20 AZN/kWh","Gecə tarifi (22:00–06:00)","#818cf8"]
-        ].map(([r,d,c]) => (
-          <div key={r} style={{ background: cBg, borderRadius: 14, padding: "18px 16px", marginBottom: 12, border: `1px solid ${bC}` }}>
-            <div style={{ fontSize: 26, fontWeight: 900, color: c }}>{r}</div>
-            <div style={{ color: tS, marginTop: 4, fontSize: 14 }}>{d}</div>
-          </div>
-        ))}
-      </div>
-    );
-    if (nav === "stations") return (
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Stansiyalar</h2>
-        <div style={{ background: cBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${bC}` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div>
-              <div style={{ fontWeight: 800, color: tP, fontSize: 16 }}>{STATION_ID}</div>
-              <div style={{ color: tS, fontSize: 13, marginTop: 3 }}>Bakı, Nərimanov r., AzərGold, 12</div>
-            </div>
-            <div style={{ background: "#dcfce7", color: "#16a34a", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700 }}>Aktiv</div>
-          </div>
-          <div style={{ marginTop: 12, fontSize: 13, color: tS }}>Güc: 7.2 kW · GB/T AC · 24/7</div>
-        </div>
-      </div>
-    );
-    if (nav === "about") return (
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Haqqında</h2>
-        <div style={{ background: cBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${bC}`, color: tS, fontSize: 14, lineHeight: 1.8 }}>
-          <p style={{ marginBottom: 8 }}>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p>
-          <p style={{ marginBottom: 8 }}>Versiya: <strong style={{ color: "#6366f1" }}>1.0.0</strong></p>
-          <p>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>
-        </div>
-      </div>
-    );
-
-    /* New Session — mobile: single card */
-    if (mob) {
-      const cards = [
-        <QRStep onStart={() => setStep(2)}/>,
-        <DepositStep onPay={d => { setDep(d); setStep(3); }}/>,
-        <ChargingStep deposit={dep} onStop={stop}/>,
-        <ResultStep deposit={dep} kwh={fKwh} onNew={newSess} onSessions={() => go("sessions")}/>
-      ];
-      return (
-        <div>
-          <Steps cur={step} mob/>
-          <div style={{ background: cBg, borderRadius: 18, padding: "20px 16px", border: "2px solid #6366f1", boxShadow: "0 8px 32px #6366f120", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }}/>
-            {cards[step-1]}
-          </div>
-          <div style={{ marginTop: 14, background: "#eef2ff", borderRadius: 12, padding: "11px 14px", display: "flex", gap: 8, alignItems: "flex-start" }}>
-            <span>ℹ️</span>
-            <div style={{ fontSize: 12, color: "#6366f1" }}><strong>Demo:</strong> Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.</div>
-          </div>
-        </div>
-      );
-    }
-
-    /* Desktop: 4-col grid */
-    return (
-      <div>
-        <Steps cur={step} mob={false}/>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
-          {[1,2,3,4].map(s => (
-            <div key={s} style={{
-              background: cBg, borderRadius: 18, padding: 22,
-              boxShadow: step===s ? "0 8px 32px #6366f120" : "0 2px 12px #0000000a",
-              border: step===s ? "2px solid #6366f1" : `1.5px solid ${bC}`,
-              opacity: step<s ? 0.5 : 1, transition: "all 0.3s",
-              position: "relative", overflow: "hidden"
-            }}>
-              {step===s && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }}/>}
-              {s===1 && <QRStep onStart={() => setStep(2)}/>}
-              {s===2 && (step>=2 ? <DepositStep onPay={d=>{ setDep(d); setStep(3); }}/> : <Placeholder icon="💳" title="2. Depozit"/>)}
-              {s===3 && (step===3 ? <ChargingStep deposit={dep} onStop={stop}/> : step>3 ? <Placeholder icon="✅" title="Tamamlandı"/> : <Placeholder icon="⚡" title="3. Şarj Prosesi"/>)}
-              {s===4 && (step===4 ? <ResultStep deposit={dep} kwh={fKwh} onNew={newSess} onSessions={() => go("sessions")}/> : <Placeholder icon="🏁" title="4. Nəticə"/>)}
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 20, background: "#eef2ff", borderRadius: 14, padding: "14px 18px", display: "flex", gap: 10 }}>
-          <span>ℹ️</span>
-          <div>
-            <div style={{ fontWeight: 700, color: "#6366f1", fontSize: 14 }}>Demo Versiya Haqqında</div>
-            <div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>Bu sistem demo məqsədlidir. Bütün məlumatlar simulyasiya olunur. Real ödəniş sistemi inteqrasiya edilməyib.</div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  /* ── MOBILE LAYOUT ── */
-  if (mob) return (
-    <div style={{ minHeight: "100vh", background: bg, display: "flex", flexDirection: "column" }}>
-      <div style={{ background: "#1e293b", color: "#fff", padding: "13px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 20, background: "#6366f1", borderRadius: 7, padding: "3px 7px" }}>⚡</span>
-          <span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <span style={{ fontSize: 11, color: "#94a3b8", background: "#334155", padding: "4px 8px", borderRadius: 6 }}>0.30 AZN/kWh</span>
-          <button onClick={() => setTheme(t => t==="light"?"dark":"light")}
-            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, padding: 0 }}>
-            {theme==="light" ? "🌙" : "☀️"}
-          </button>
-        </div>
-      </div>
-      <div style={{ flex: 1, padding: "16px 14px 88px", overflowY: "auto" }}>
-        <Page/>
-      </div>
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: dk?"#1e293b":"#fff", borderTop: `1.5px solid ${bC}`, display: "flex", zIndex: 50, boxShadow: "0 -2px 16px #0000001a" }}>
-        {NAV_ITEMS.map(n => (
-          <button key={n.id} onClick={() => go(n.id)} style={{
-            flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", gap: 2, padding: "10px 0 8px",
-            border: "none", cursor: "pointer", background: "transparent",
-            color: nav===n.id ? "#6366f1" : dk?"#64748b":"#94a3b8",
-            borderTop: nav===n.id ? "2.5px solid #6366f1" : "2.5px solid transparent"
-          }}>
-            <span style={{ fontSize: 18 }}>{n.icon}</span>
-            <span style={{ fontSize: 10, fontWeight: nav===n.id?700:500 }}>{n.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  /* ── DESKTOP LAYOUT ── */
-  return (
-    <div style={{ display: "flex", minHeight: "100vh", background: bg }}>
-      <div style={{ width: 220, background: "#1e293b", color: "#fff", display: "flex", flexDirection: "column", padding: "0 0 20px", flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
-        <div style={{ padding: "20px 20px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #334155" }}>
-          <span style={{ fontSize: 22, background: "#6366f1", borderRadius: 8, padding: "4px 8px" }}>⚡</span>
-          <span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
-        </div>
-        <nav style={{ padding: "12px 8px", flex: 1 }}>
-          {NAV_ITEMS.map(n => (
-            <button key={n.id} onClick={() => go(n.id)} style={{
-              width: "100%", display: "flex", alignItems: "center", gap: 10,
-              padding: "11px 14px", borderRadius: 10, border: "none", cursor: "pointer",
-              background: nav===n.id ? "#6366f1" : "transparent",
-              color: nav===n.id ? "#fff" : "#94a3b8",
-              fontSize: 14, fontWeight: nav===n.id?700:500,
-              marginBottom: 4, transition: "all 0.2s", textAlign: "left"
-            }}><span>{n.icon}</span> {n.label}</button>
-          ))}
-        </nav>
-        <div style={{ margin: "0 12px", background: "#334155", borderRadius: 12, padding: "12px 14px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <span>🧪</span><span style={{ fontWeight: 700, fontSize: 13 }}>Demo Rejimi</span>
-          </div>
-          <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>Simulyasiya üzərindən işləyir. Real ödəniş alınmır.</div>
-        </div>
-      </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <div style={{ background: dk?"#1e293b":"#fff", borderBottom: `1px solid ${bC}`, padding: "12px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ background: "#eef2ff", color: "#6366f1", borderRadius: 8, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>🧪 Demo Mode</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <span style={{ fontSize: 14, color: tS }}>Tarif: <strong style={{ color: "#6366f1" }}>0.30 AZN / kWh</strong></span>
-            <button onClick={() => setTheme(t => t==="light"?"dark":"light")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18 }}>{theme==="light"?"🌙":"☀️"}</button>
-            <div style={{ background: dk?"#334155":"#f1f5f9", borderRadius: 8, padding: "5px 12px", fontSize: 13, fontWeight: 600, color: tS }}>🌐 AZ</div>
-          </div>
-        </div>
-        <div style={{ flex: 1, padding: "24px 28px 20px", overflowY: "auto" }}><Page/></div>
-        <div style={{ textAlign: "center", padding: "12px", color: "#94a3b8", fontSize: 12, borderTop: `1px solid ${bC}`, background: dk?"#1e293b":"#fff" }}>
-          © 2026 MQ Charge. Bütün hüquqlar qorunur. ♡
-        </div>
-      </div>
-    </div>
-  );
+function goNav(id){
+if(S.iv&&id!==“new”){clearInterval(S.iv);S.iv=null;}
+if(id===“new”){set({nav:“new”,step:1,dep:0,fkwh:0,kwh:0,el:0,amt:10,pm:“card”,cn:””,busy:false,iv:null});}
+else set({nav:id});
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-```
+function R(){
+var root=document.getElementById(“app”);root.innerHTML=””;
+var dk=S.theme===“dark”;
+var app=d(“app”);if(dk)app.classList.add(“dark”);
 
-  </script>
+if(mob){
+var tb=d(“topbar”,[
+d(“logo”,[d(“logo-icon”,“⚡”),“MQ Charge”]),
+d(””,[ d(“tarif-badge”,“0.30 AZN/kWh”), btn(“theme-btn”,dk?“☀️”:“🌙”,function(){set({theme:dk?“light”:“dark”});}) ],{display:“flex”,gap:“10px”,alignItems:“center”})
+]);
+app.appendChild(tb);
+var ct=d(“content”);ct.appendChild(buildPage());app.appendChild(ct);
+var bn=d(“bottomnav”);
+NAVS.forEach(function(n){
+var b=d(“navbtn”+(S.nav===n.id?” active”:””),[d(“icon”,n.ic),n.lb]);
+b.addEventListener(“click”,function(){goNav(n.id);});
+bn.appendChild(b);
+});
+app.appendChild(bn);
+} else {
+var sb=d(“sidebar”);
+sb.appendChild(d(“sb-logo”,[d(“sb-logo-icon”,“⚡”),“MQ Charge”]));
+var sn=d(“sb-nav”);
+NAVS.forEach(function(n){var b=btn(“sb-btn”+(S.nav===n.id?” active”:””),n.ic+” “+n.lb,function(){goNav(n.id);});sn.appendChild(b);});
+sb.appendChild(sn);
+sb.appendChild(d(“sb-demo”,[d(“sb-demo-title”,[“🧪 “,“Demo Rejimi”]),d(“sb-demo-txt”,“Simulyasiya üzərindən işləyir. Real ödəniş alınmır.”)]));
+app.appendChild(sb);
+var dm=d(“desktop-main”);
+var thb=btn(””,dk?“☀️”:“🌙”,function(){set({theme:dk?“light”:“dark”});});thb.style.cssText=“background:none;border:none;cursor:pointer;font-size:18px;”;
+var hdr=d(“dsk-header”,[d(“demo-badge”,“🧪 Demo Mode”),d(“hdr-right”,[d(“hdr-tarif”,[“Tarif: “,h(“strong”,””,[“0.30 AZN / kWh”],{color:”#6366f1”})]),thb,d(“lang-badge”,“🌐 AZ”)])]);
+dm.appendChild(hdr);
+var ct2=d(“content”);ct2.appendChild(buildPage());dm.appendChild(ct2);
+dm.appendChild(d(“dsk-footer”,“© 2026 MQ Charge. Bütün hüquqlar qorunur. ♡”));
+app.appendChild(dm);
+}
+root.appendChild(app);
+}
+R();
+</script>
+
 </body>
 </html>
