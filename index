@@ -1,496 +1,523 @@
-import { useState, useEffect, useRef } from “react”;
+<!DOCTYPE html>
 
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>MQ Charge — EV Şarj Stansiyası</title>
+  <meta name="description" content="GB/T AC dəstəkli elektrik avtomobil şarj sistemi" />
+  <meta name="theme-color" content="#1e293b" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+    button { font-family: inherit; }
+    input { font-family: inherit; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+```
 const TARIFF = 0.30;
-const STATION_ID = “AZE-001”;
-
+const STATION_ID = "AZE-001";
 const NAV_ITEMS = [
-{ id: “new”,      icon: “⚡”, label: “Sessiya”   },
-{ id: “sessions”, icon: “📋”, label: “Tarixçə”   },
-{ id: “tariffs”,  icon: “💰”, label: “Tariflər”  },
-{ id: “stations”, icon: “🗺️”, label: “Stansiya” },
-{ id: “about”,    icon: “ℹ️”, label: “Haqqında” },
+  { id: "new",      icon: "⚡", label: "Sessiya"  },
+  { id: "sessions", icon: "📋", label: "Tarixçə"  },
+  { id: "tariffs",  icon: "💰", label: "Tariflər" },
+  { id: "stations", icon: "🗺️", label: "Stansiya"},
+  { id: "about",    icon: "ℹ️", label: "Haqqında"},
 ];
 
 function useWidth() {
-const [w, setW] = useState(typeof window !== “undefined” ? window.innerWidth : 1024);
-useEffect(() => {
-const h = () => setW(window.innerWidth);
-window.addEventListener(“resize”, h);
-return () => window.removeEventListener(“resize”, h);
-}, []);
-return w;
+  const [w, setW] = useState(window.innerWidth);
+  useEffect(() => {
+    const h = () => setW(window.innerWidth);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+  return w;
 }
 
-function CircularProgress({ percent, value, unit, status }) {
-const r = 72, circ = 2 * Math.PI * r;
-const dash = circ * Math.min(percent, 100) / 100;
-const color = percent < 40 ? “#22c55e” : percent < 75 ? “#f59e0b” : “#ef4444”;
-return (
-<div style={{ position: “relative”, width: 180, height: 180, margin: “0 auto” }}>
-<svg width=“180” height=“180” style={{ transform: “rotate(-90deg)” }}>
-<circle cx="90" cy="90" r={r} fill="none" stroke="#e2e8f0" strokeWidth="11" />
-<circle cx=“90” cy=“90” r={r} fill=“none” stroke={color} strokeWidth=“11”
-strokeDasharray={`${dash} ${circ}`} strokeLinecap=“round”
-style={{ transition: “stroke-dasharray 0.5s ease” }} />
-</svg>
-<div style={{ position: “absolute”, inset: 0, display: “flex”, flexDirection: “column”, alignItems: “center”, justifyContent: “center” }}>
-<span style={{ fontSize: 16 }}>⚡</span>
-<span style={{ fontSize: 30, fontWeight: 900, color: “#1e293b”, lineHeight: 1 }}>{value}</span>
-<span style={{ fontSize: 13, color: “#64748b”, fontWeight: 600 }}>{unit}</span>
-<span style={{ marginTop: 5, fontSize: 11, background: “#dcfce7”, color: “#16a34a”, padding: “2px 10px”, borderRadius: 20, fontWeight: 700 }}>{status}</span>
-</div>
-</div>
-);
-}
-
-function StepIndicator({ current, isMobile }) {
-const steps = [“QR”, “Depozit”, “Şarj”, “Nəticə”];
-const connW = isMobile ? 28 : 60;
-return (
-<div style={{ display: “flex”, alignItems: “center”, justifyContent: “center”, marginBottom: 20 }}>
-{steps.map((s, i) => {
-const n = i + 1, active = n === current, done = n < current;
-return (
-<div key={s} style={{ display: “flex”, alignItems: “center” }}>
-<div style={{ display: “flex”, flexDirection: “column”, alignItems: “center”, gap: 4 }}>
-<div style={{
-width: isMobile ? 28 : 36, height: isMobile ? 28 : 36, borderRadius: “50%”,
-background: active || done ? “#6366f1” : “#e2e8f0”,
-color: active || done ? “#fff” : “#94a3b8”,
-display: “flex”, alignItems: “center”, justifyContent: “center”,
-fontWeight: 800, fontSize: isMobile ? 11 : 14,
-boxShadow: active ? “0 0 0 3px #c7d2fe” : “none”,
-flexShrink: 0, transition: “all 0.3s”
-}}>{done ? “✓” : n}</div>
-<span style={{ fontSize: isMobile ? 9 : 11, color: active ? “#6366f1” : “#94a3b8”, fontWeight: active ? 700 : 500, whiteSpace: “nowrap” }}>{s}</span>
-</div>
-{i < steps.length - 1 && (
-<div style={{ width: connW, height: 2, background: done ? “#6366f1” : “#e2e8f0”, marginBottom: 18, flexShrink: 0, transition: “background 0.3s” }} />
-)}
-</div>
-);
-})}
-</div>
-);
-}
-
-function QRStep({ onStart }) {
-return (
-<div style={{ display: “flex”, flexDirection: “column”, alignItems: “center”, gap: 14 }}>
-<h2 style={{ fontSize: 17, fontWeight: 800, color: “#6366f1”, margin: 0 }}>1. QR Scan</h2>
-<p style={{ color: “#64748b”, fontSize: 13, textAlign: “center”, margin: 0 }}>
-Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.
-</p>
-<div style={{ border: “2px solid #6366f1”, borderRadius: 14, padding: 10, background: “#f8fafc”, boxShadow: “0 4px 20px #6366f115” }}>
-<svg width="150" height="150" viewBox="0 0 160 160">
-{[0,1,2,3,4,5,6].map(row => [0,1,2,3,4,5,6].map(col => {
-const p = [[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
-return <rect key={`${row}-${col}`} x={col*22+4} y={row*22+4} width={20} height={20} fill={p[row][col] ? “#1e293b” : “#f8fafc”} rx={2}/>;
-}))}
-{Array.from({length:100}).map((_,i) => {
-const rr=Math.floor(i/10), cc=i%10, x=cc*9+30, y=rr*9+30;
-if (x>25&&x<130&&y>25&&y<130&&!(x<60&&y<60)&&!(x>100&&y<60)&&!(x<60&&y>100)) {
-if ((rr*13+cc*7)%3===0) return <rect key={i} x={x} y={y} width={8} height={8} fill="#1e293b" rx={1}/>;
-}
-return null;
-})}
-</svg>
-</div>
-<div style={{ background: “#f1f5f9”, borderRadius: 8, padding: “7px 18px”, fontSize: 13, color: “#475569” }}>
-Stansiya ID: <strong style={{ color: “#6366f1” }}>{STATION_ID}</strong>
-</div>
-<p style={{ color: “#94a3b8”, fontSize: 12, margin: 0 }}>və ya</p>
-<button onClick={onStart} style={primaryBtn}>▶ Demo olaraq başla</button>
-</div>
-);
-}
-
-const AMOUNTS = [5, 10, 20, 50, 100];
-function DepositStep({ onPay }) {
-const [amount, setAmount] = useState(10);
-const [payMethod, setPayMethod] = useState(“card”);
-const [cardNum, setCardNum] = useState(””);
-const [paying, setPaying] = useState(false);
-
-const handlePay = async () => {
-setPaying(true);
-await new Promise(r => setTimeout(r, 1800));
-setPaying(false);
-onPay(amount);
+const pBtn = {
+  background: "linear-gradient(135deg,#6366f1,#818cf8)", color: "#fff",
+  border: "none", borderRadius: 13, padding: "15px", fontSize: 15, fontWeight: 700,
+  cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+  justifyContent: "center", boxShadow: "0 4px 20px #6366f140", width: "100%"
+};
+const sBtn = {
+  width: 44, height: 44, borderRadius: 10, border: "1.5px solid #e2e8f0",
+  background: "#fff", fontSize: 22, cursor: "pointer", color: "#475569",
+  display: "flex", alignItems: "center", justifyContent: "center",
+  fontWeight: 700, flexShrink: 0
 };
 
-return (
-<div style={{ display: “flex”, flexDirection: “column”, gap: 14 }}>
-<h2 style={{ fontSize: 17, fontWeight: 800, color: “#6366f1”, margin: 0, textAlign: “center” }}>2. Depozit</h2>
-<p style={{ color: “#64748b”, fontSize: 13, textAlign: “center”, margin: 0 }}>Şarjə başlamaq üçün depozit məbləğini daxil edin.</p>
-<div>
-<div style={{ textAlign: “center”, fontSize: 12, color: “#94a3b8”, marginBottom: 8 }}>Depozit məbləği (AZN)</div>
-<div style={{ display: “flex”, alignItems: “center”, justifyContent: “center”, gap: 14 }}>
-<button onClick={() => setAmount(a => Math.max(1, a-1))} style={smallBtn}>−</button>
-<span style={{ fontSize: 34, fontWeight: 900, color: “#1e293b”, minWidth: 56, textAlign: “center” }}>{amount}</span>
-<button onClick={() => setAmount(a => Math.min(500, a+1))} style={smallBtn}>+</button>
-</div>
-<div style={{ display: “flex”, flexWrap: “wrap”, gap: 8, justifyContent: “center”, marginTop: 10 }}>
-{AMOUNTS.map(a => (
-<button key={a} onClick={() => setAmount(a)} style={{
-padding: “9px 14px”, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: “pointer”,
-border: amount===a ? “2px solid #6366f1” : “1.5px solid #e2e8f0”,
-background: amount===a ? “#eef2ff” : “#fff”, color: amount===a ? “#6366f1” : “#475569”, minWidth: 60
-}}>{a} AZN</button>
-))}
-</div>
-</div>
-<div>
-<div style={{ fontSize: 12, color: “#94a3b8”, marginBottom: 8 }}>Ödəniş üsulu</div>
-<div style={{ display: “flex”, gap: 8 }}>
-{[[“card”,“💳 Bank Kartı”],[“transfer”,“🏦 Köçürmə”]].map(([k,label]) => (
-<button key={k} onClick={() => setPayMethod(k)} style={{
-flex: 1, padding: “11px 8px”, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: “pointer”,
-border: payMethod===k ? “2px solid #6366f1” : “1.5px solid #e2e8f0”,
-background: payMethod===k ? “#eef2ff” : “#fff”, color: payMethod===k ? “#6366f1” : “#475569”
-}}>{label}</button>
-))}
-</div>
-{payMethod === “card” && (
-<input value={cardNum} onChange={e => setCardNum(e.target.value.replace(/\D/g,””).slice(0,16))}
-placeholder=”**** **** **** ****”
-style={{ marginTop: 10, width: “100%”, padding: “12px 14px”, borderRadius: 10, border: “1.5px solid #e2e8f0”, fontSize: 15, outline: “none”, fontFamily: “monospace”, letterSpacing: 2, boxSizing: “border-box” }} />
-)}
-{payMethod === “transfer” && (
-<div style={{ marginTop: 10, background: “#f8fafc”, borderRadius: 10, padding: “10px 14px”, fontSize: 12, color: “#64748b” }}>
-<div>IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong></div>
-<div style={{ marginTop: 4 }}>Təyinat: <strong>EV-{STATION_ID}</strong></div>
-</div>
-)}
-</div>
-<div style={{ background: “#eef2ff”, borderRadius: 10, padding: “10px 14px”, fontSize: 12, color: “#6366f1”, display: “flex”, gap: 8 }}>
-<span>ℹ️</span><span>Depozit bitərsə şarj avtomatik dayandırılacaq.</span>
-</div>
-<button onClick={handlePay} disabled={paying} style={{ …primaryBtn, background: paying ? “#a5b4fc” : “linear-gradient(135deg,#6366f1,#818cf8)”, cursor: paying ? “default” : “pointer” }}>
-{paying ? “🔄 Emal olunur…” : “🔒 Ödə və Başla”}
-</button>
-</div>
-);
-}
-
-function ChargingStep({ deposit, onStop }) {
-const [elapsed, setElapsed] = useState(0);
-const [kwh, setKwh] = useState(0);
-const power = 6.8;
-const maxKwh = deposit / TARIFF;
-const intRef = useRef(null);
-
-useEffect(() => {
-intRef.current = setInterval(() => {
-setElapsed(e => e + 1);
-setKwh(k => {
-const next = k + power / 3600;
-if (next >= maxKwh) { clearInterval(intRef.current); onStop(Math.min(next, maxKwh)); return Math.min(next, maxKwh); }
-return next;
-});
-}, 1000);
-return () => clearInterval(intRef.current);
-}, []);
-
-const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-const cost = (kwh * TARIFF).toFixed(2);
-const pct = Math.min((kwh / maxKwh) * 100, 100);
-
-return (
-<div style={{ display: “flex”, flexDirection: “column”, gap: 14 }}>
-<h2 style={{ fontSize: 17, fontWeight: 800, color: “#6366f1”, margin: 0, textAlign: “center” }}>3. Şarj Prosesi</h2>
-<p style={{ color: “#64748b”, fontSize: 13, textAlign: “center”, margin: 0 }}>Şarj prosesi aktivdir. Real-time məlumatları izləyin.</p>
-<CircularProgress percent={pct} value={kwh.toFixed(2)} unit="kWh" status="Şarj aktivdir" />
-<div style={{ display: “flex”, flexDirection: “column”, gap: 8 }}>
-{[[“🕐”,“Müddət”,fmt(elapsed)],[“⚡”,“Güc”,`${power} kW`],[“💰”,“Cari xərc”,`${cost} AZN`]].map(([icon,label,val]) => (
-<div key={label} style={{ display: “flex”, justifyContent: “space-between”, alignItems: “center”, background: “#f8fafc”, borderRadius: 10, padding: “11px 14px” }}>
-<span style={{ fontSize: 13, color: “#64748b” }}>{icon} {label}</span>
-<span style={{ fontWeight: 700, color: “#1e293b”, fontSize: 14 }}>{val}</span>
-</div>
-))}
-</div>
-<button onClick={() => { clearInterval(intRef.current); onStop(kwh); }} style={{ …primaryBtn, background: “#ef4444”, boxShadow: “0 4px 20px #ef444430” }}>
-⏹ Şarjı Dayandır
-</button>
-</div>
-);
-}
-
-function ResultStep({ deposit, kwh, onNew, onSessions }) {
-const cost = (kwh * TARIFF).toFixed(2);
-const change = (deposit - parseFloat(cost)).toFixed(2);
-return (
-<div style={{ display: “flex”, flexDirection: “column”, gap: 14 }}>
-<h2 style={{ fontSize: 17, fontWeight: 800, color: “#6366f1”, margin: 0, textAlign: “center” }}>4. Nəticə</h2>
-<div style={{ display: “flex”, flexDirection: “column”, alignItems: “center”, gap: 6 }}>
-<div style={{ width: 56, height: 56, borderRadius: “50%”, background: “#dcfce7”, display: “flex”, alignItems: “center”, justifyContent: “center”, fontSize: 26 }}>✅</div>
-<span style={{ color: “#16a34a”, fontWeight: 800, fontSize: 15 }}>Uğurlu şəkildə tamamlandı!</span>
-</div>
-{[[“İstifadə olunan enerji”,`${kwh.toFixed(2)} kWh`,”#1e293b”],[“Ümumi xərc”,`${cost} AZN`,”#1e293b”],[“Depozit”,`${deposit.toFixed(2)} AZN`,”#1e293b”],[“Qalıq məbləğ (geri qaytarılacaq)”,`${change} AZN`,”#16a34a”]].map(([label,val,vc]) => (
-<div key={label} style={{ display: “flex”, justifyContent: “space-between”, alignItems: “center”, padding: “10px 0”, borderBottom: “1px solid #f1f5f9” }}>
-<span style={{ fontSize: 13, color: “#64748b”, maxWidth: “60%” }}>{label}</span>
-<span style={{ fontWeight: 700, color: vc, fontSize: 14 }}>{val}</span>
-</div>
-))}
-<button onClick={onNew} style={primaryBtn}>🔄 Yeni Sessiya</button>
-<button onClick={onSessions} style={{ …primaryBtn, background: “#fff”, color: “#475569”, border: “1.5px solid #e2e8f0”, boxShadow: “none” }}>📋 Sessiyalarım</button>
-</div>
-);
-}
-
-const primaryBtn = {
-background: “linear-gradient(135deg,#6366f1,#818cf8)”, color: “#fff”,
-border: “none”, borderRadius: 13, padding: “15px”, fontSize: 15, fontWeight: 700,
-cursor: “pointer”, display: “flex”, alignItems: “center”, gap: 8, justifyContent: “center”,
-boxShadow: “0 4px 20px #6366f140”, width: “100%”
-};
-const smallBtn = {
-width: 42, height: 42, borderRadius: 10, border: “1.5px solid #e2e8f0”,
-background: “#fff”, fontSize: 22, cursor: “pointer”, color: “#475569”,
-display: “flex”, alignItems: “center”, justifyContent: “center”, fontWeight: 700, flexShrink: 0
-};
-
-function PlaceholderCard({ icon, title }) {
-return (
-<div style={{ textAlign: “center”, color: “#94a3b8”, padding: “24px 16px” }}>
-<div style={{ fontSize: 28, marginBottom: 8 }}>{icon}</div>
-<div style={{ fontWeight: 700, color: “#6366f1”, fontSize: 14 }}>{title}</div>
-</div>
-);
-}
-
-export default function EVCharger() {
-const width = useWidth();
-const isMobile = width < 768;
-
-const [activeNav, setActiveNav] = useState(“new”);
-const [step, setStep] = useState(1);
-const [deposit, setDeposit] = useState(0);
-const [finalKwh, setFinalKwh] = useState(0);
-const [sessions, setSessions] = useState([]);
-const [theme, setTheme] = useState(“light”);
-
-const isDark = theme === “dark”;
-const bg = isDark ? “#0f172a” : “#f1f5f9”;
-const cardBg = isDark ? “#1e293b” : “#ffffff”;
-const textPrimary = isDark ? “#f1f5f9” : “#1e293b”;
-const textSecondary = isDark ? “#94a3b8” : “#64748b”;
-const borderColor = isDark ? “#334155” : “#e2e8f0”;
-
-const handleStop = (kwh) => {
-const cost = (kwh * TARIFF).toFixed(2);
-setSessions(prev => [{ id: `S-${prev.length+1}`, date: new Date().toLocaleString(“az-AZ”), kwh: kwh.toFixed(2), cost, station: STATION_ID }, …prev]);
-setFinalKwh(kwh);
-setStep(4);
-};
-
-const handleNew = () => { setStep(1); setDeposit(0); setFinalKwh(0); setActiveNav(“new”); };
-const navigate = (id) => { setActiveNav(id); if (id === “new”) handleNew(); };
-
-const renderPage = () => {
-if (activeNav === “sessions”) return (
-<div>
-<h2 style={{ fontSize: 18, fontWeight: 800, color: textPrimary, marginBottom: 14 }}>Sessiyalarım</h2>
-{sessions.length === 0
-? <div style={{ textAlign: “center”, color: textSecondary, padding: 40, background: cardBg, borderRadius: 14, border: `1px solid ${borderColor}` }}>Hələ sessiya yoxdur.</div>
-: sessions.map(s => (
-<div key={s.id} style={{ background: cardBg, borderRadius: 14, padding: “14px 16px”, marginBottom: 10, border: `1px solid ${borderColor}`, display: “flex”, justifyContent: “space-between”, alignItems: “center” }}>
-<div>
-<div style={{ fontWeight: 700, color: textPrimary }}>{s.id}</div>
-<div style={{ fontSize: 12, color: textSecondary, marginTop: 2 }}>{s.date} · {s.station}</div>
-</div>
-<div style={{ textAlign: “right” }}>
-<div style={{ fontWeight: 800, color: “#6366f1” }}>{s.kwh} kWh</div>
-<div style={{ fontSize: 13, color: textSecondary }}>{s.cost} AZN</div>
-</div>
-</div>
-))
-}
-</div>
-);
-
-```
-if (activeNav === "tariffs") return (
-  <div>
-    <h2 style={{ fontSize: 18, fontWeight: 800, color: textPrimary, marginBottom: 14 }}>Tariflər</h2>
-    {[["0.30 AZN/kWh","Standart gündüz tarifi (06:00–22:00)","#6366f1"],["0.20 AZN/kWh","Gecə tarifi (22:00–06:00)","#818cf8"]].map(([rate,desc,c]) => (
-      <div key={rate} style={{ background: cardBg, borderRadius: 14, padding: "18px 16px", marginBottom: 12, border: `1px solid ${borderColor}` }}>
-        <div style={{ fontSize: 26, fontWeight: 900, color: c }}>{rate}</div>
-        <div style={{ color: textSecondary, marginTop: 4, fontSize: 14 }}>{desc}</div>
-      </div>
-    ))}
-  </div>
-);
-
-if (activeNav === "stations") return (
-  <div>
-    <h2 style={{ fontSize: 18, fontWeight: 800, color: textPrimary, marginBottom: 14 }}>Stansiyalar</h2>
-    <div style={{ background: cardBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${borderColor}` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <div style={{ fontWeight: 800, color: textPrimary, fontSize: 16 }}>{STATION_ID}</div>
-          <div style={{ color: textSecondary, fontSize: 13, marginTop: 3 }}>Bakı, Nərimanov r., AzərGold, 12</div>
-        </div>
-        <div style={{ background: "#dcfce7", color: "#16a34a", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700 }}>Aktiv</div>
-      </div>
-      <div style={{ marginTop: 12, fontSize: 13, color: textSecondary }}>Güc: 7.2 kW · AC tip · 24/7</div>
-    </div>
-  </div>
-);
-
-if (activeNav === "about") return (
-  <div>
-    <h2 style={{ fontSize: 18, fontWeight: 800, color: textPrimary, marginBottom: 14 }}>Haqqında</h2>
-    <div style={{ background: cardBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${borderColor}`, color: textSecondary, fontSize: 14, lineHeight: 1.8 }}>
-      <p style={{ margin: "0 0 8px" }}>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p>
-      <p style={{ margin: "0 0 8px" }}>Versiya: <strong style={{ color: "#6366f1" }}>1.0.0</strong></p>
-      <p style={{ margin: 0 }}>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>
-    </div>
-  </div>
-);
-
-/* New Session */
-if (isMobile) {
-  const steps = [
-    <QRStep onStart={() => setStep(2)} />,
-    <DepositStep onPay={d => { setDeposit(d); setStep(3); }} />,
-    <ChargingStep deposit={deposit} onStop={handleStop} />,
-    <ResultStep deposit={deposit} kwh={finalKwh} onNew={handleNew} onSessions={() => navigate("sessions")} />
-  ];
+/* ── Circular gauge ── */
+function Gauge({ pct, value, unit, status }) {
+  const r = 72, c = 2 * Math.PI * r;
+  const dash = c * Math.min(pct, 100) / 100;
+  const color = pct < 40 ? "#22c55e" : pct < 75 ? "#f59e0b" : "#ef4444";
   return (
-    <div>
-      <StepIndicator current={step} isMobile />
-      <div style={{ background: cardBg, borderRadius: 18, padding: "20px 16px", border: "2px solid #6366f1", boxShadow: "0 8px 32px #6366f120", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }} />
-        {steps[step - 1]}
-      </div>
-      <div style={{ marginTop: 14, background: "#eef2ff", borderRadius: 12, padding: "11px 14px", display: "flex", gap: 8, alignItems: "flex-start" }}>
-        <span style={{ fontSize: 14 }}>ℹ️</span>
-        <div style={{ fontSize: 12, color: "#6366f1" }}><strong>Demo:</strong> Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.</div>
+    <div style={{ position: "relative", width: 180, height: 180, margin: "0 auto" }}>
+      <svg width="180" height="180" style={{ transform: "rotate(-90deg)" }}>
+        <circle cx="90" cy="90" r={r} fill="none" stroke="#e2e8f0" strokeWidth="11"/>
+        <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="11"
+          strokeDasharray={`${dash} ${c}`} strokeLinecap="round"
+          style={{ transition: "stroke-dasharray 0.5s ease" }}/>
+      </svg>
+      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontSize: 16 }}>⚡</span>
+        <span style={{ fontSize: 30, fontWeight: 900, color: "#1e293b", lineHeight: 1 }}>{value}</span>
+        <span style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>{unit}</span>
+        <span style={{ marginTop: 5, fontSize: 11, background: "#dcfce7", color: "#16a34a", padding: "2px 10px", borderRadius: 20, fontWeight: 700 }}>{status}</span>
       </div>
     </div>
   );
 }
 
-return (
-  <div>
-    <StepIndicator current={step} isMobile={false} />
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
-      {[1,2,3,4].map(s => (
-        <div key={s} style={{
-          background: cardBg, borderRadius: 18, padding: 22,
-          boxShadow: step===s ? "0 8px 32px #6366f120" : "0 2px 12px #0000000a",
-          border: step===s ? "2px solid #6366f1" : `1.5px solid ${borderColor}`,
-          opacity: step < s ? 0.5 : 1, transition: "all 0.3s", position: "relative", overflow: "hidden"
-        }}>
-          {step===s && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }} />}
-          {s===1 && <QRStep onStart={() => setStep(2)} />}
-          {s===2 && (step>=2 ? <DepositStep onPay={d => { setDeposit(d); setStep(3); }} /> : <PlaceholderCard icon="💳" title="2. Depozit" />)}
-          {s===3 && (step===3 ? <ChargingStep deposit={deposit} onStop={handleStop} /> : step>3 ? <PlaceholderCard icon="✅" title="Tamamlandı" /> : <PlaceholderCard icon="⚡" title="3. Şarj Prosesi" />)}
-          {s===4 && (step===4 ? <ResultStep deposit={deposit} kwh={finalKwh} onNew={handleNew} onSessions={() => navigate("sessions")} /> : <PlaceholderCard icon="🏁" title="4. Nəticə" />)}
+/* ── Step indicator ── */
+function Steps({ cur, mob }) {
+  const steps = ["QR", "Depozit", "Şarj", "Nəticə"];
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+      {steps.map((s, i) => {
+        const n = i+1, act = n===cur, dn = n<cur;
+        return (
+          <div key={s} style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              <div style={{
+                width: mob?28:36, height: mob?28:36, borderRadius: "50%",
+                background: act||dn ? "#6366f1" : "#e2e8f0",
+                color: act||dn ? "#fff" : "#94a3b8",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 800, fontSize: mob?11:14,
+                boxShadow: act ? "0 0 0 3px #c7d2fe" : "none",
+                transition: "all 0.3s", flexShrink: 0
+              }}>{dn ? "✓" : n}</div>
+              <span style={{ fontSize: mob?9:11, color: act?"#6366f1":"#94a3b8", fontWeight: act?700:500, whiteSpace: "nowrap" }}>{s}</span>
+            </div>
+            {i < steps.length-1 && (
+              <div style={{ width: mob?28:60, height: 2, background: dn?"#6366f1":"#e2e8f0", marginBottom: 18, flexShrink: 0, transition: "background 0.3s" }}/>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── QR Step ── */
+function QRStep({ onStart }) {
+  const pat = [[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0 }}>1. QR Scan</h2>
+      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.</p>
+      <div style={{ border: "2px solid #6366f1", borderRadius: 14, padding: 10, background: "#f8fafc", boxShadow: "0 4px 20px #6366f115" }}>
+        <svg width="150" height="150" viewBox="0 0 160 160">
+          {[0,1,2,3,4,5,6].map(row => [0,1,2,3,4,5,6].map(col =>
+            <rect key={`${row}-${col}`} x={col*22+4} y={row*22+4} width={20} height={20}
+              fill={pat[row][col]?"#1e293b":"#f8fafc"} rx={2}/>
+          ))}
+          {Array.from({length:100}).map((_,i) => {
+            const rr=Math.floor(i/10), cc=i%10, x=cc*9+30, y=rr*9+30;
+            if (x>25&&x<130&&y>25&&y<130&&!(x<60&&y<60)&&!(x>100&&y<60)&&!(x<60&&y>100))
+              if ((rr*13+cc*7)%3===0) return <rect key={i} x={x} y={y} width={8} height={8} fill="#1e293b" rx={1}/>;
+            return null;
+          })}
+        </svg>
+      </div>
+      <div style={{ background: "#f1f5f9", borderRadius: 8, padding: "7px 18px", fontSize: 13, color: "#475569" }}>
+        Stansiya ID: <strong style={{ color: "#6366f1" }}>{STATION_ID}</strong>
+      </div>
+      <p style={{ color: "#94a3b8", fontSize: 12 }}>və ya</p>
+      <button onClick={onStart} style={pBtn}>▶ Demo olaraq başla</button>
+    </div>
+  );
+}
+
+/* ── Deposit Step ── */
+const AMTS = [5, 10, 20, 50, 100];
+function DepositStep({ onPay }) {
+  const [amt, setAmt] = useState(10);
+  const [method, setMethod] = useState("card");
+  const [card, setCard] = useState("");
+  const [busy, setBusy] = useState(false);
+  const pay = async () => {
+    setBusy(true);
+    await new Promise(r => setTimeout(r, 1800));
+    setBusy(false); onPay(amt);
+  };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>2. Depozit</h2>
+      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Şarjə başlamaq üçün depozit məbləğini daxil edin.</p>
+      <div>
+        <div style={{ textAlign: "center", fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>Depozit məbləği (AZN)</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
+          <button onClick={() => setAmt(a => Math.max(1,a-1))} style={sBtn}>−</button>
+          <span style={{ fontSize: 34, fontWeight: 900, color: "#1e293b", minWidth: 56, textAlign: "center" }}>{amt}</span>
+          <button onClick={() => setAmt(a => Math.min(500,a+1))} style={sBtn}>+</button>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 10 }}>
+          {AMTS.map(a => (
+            <button key={a} onClick={() => setAmt(a)} style={{
+              padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+              border: amt===a ? "2px solid #6366f1" : "1.5px solid #e2e8f0",
+              background: amt===a ? "#eef2ff" : "#fff", color: amt===a ? "#6366f1" : "#475569", minWidth: 60
+            }}>{a} AZN</button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>Ödəniş üsulu</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          {[["card","💳 Bank Kartı"],["transfer","🏦 Köçürmə"]].map(([k,lbl]) => (
+            <button key={k} onClick={() => setMethod(k)} style={{
+              flex: 1, padding: "11px 8px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer",
+              border: method===k ? "2px solid #6366f1" : "1.5px solid #e2e8f0",
+              background: method===k ? "#eef2ff" : "#fff", color: method===k ? "#6366f1" : "#475569"
+            }}>{lbl}</button>
+          ))}
+        </div>
+        {method === "card" && (
+          <input value={card} onChange={e => setCard(e.target.value.replace(/\D/g,"").slice(0,16))}
+            placeholder="**** **** **** ****"
+            style={{ marginTop: 10, width: "100%", padding: "12px 14px", borderRadius: 10,
+              border: "1.5px solid #e2e8f0", fontSize: 15, outline: "none",
+              fontFamily: "monospace", letterSpacing: 2 }}/>
+        )}
+        {method === "transfer" && (
+          <div style={{ marginTop: 10, background: "#f8fafc", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#64748b" }}>
+            <div>IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong></div>
+            <div style={{ marginTop: 4 }}>Təyinat: <strong>EV-{STATION_ID}</strong></div>
+          </div>
+        )}
+      </div>
+      <div style={{ background: "#eef2ff", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#6366f1", display: "flex", gap: 8 }}>
+        <span>ℹ️</span><span>Depozit bitərsə şarj avtomatik dayandırılacaq.</span>
+      </div>
+      <button onClick={pay} disabled={busy}
+        style={{ ...pBtn, background: busy?"#a5b4fc":"linear-gradient(135deg,#6366f1,#818cf8)", cursor: busy?"default":"pointer" }}>
+        {busy ? "🔄 Emal olunur..." : "🔒 Ödə və Başla"}
+      </button>
+    </div>
+  );
+}
+
+/* ── Charging Step ── */
+function ChargingStep({ deposit, onStop }) {
+  const [elapsed, setElapsed] = useState(0);
+  const [kwh, setKwh] = useState(0);
+  const pwr = 6.8, maxKwh = deposit / TARIFF;
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current = setInterval(() => {
+      setElapsed(e => e+1);
+      setKwh(k => {
+        const nx = k + pwr/3600;
+        if (nx >= maxKwh) { clearInterval(ref.current); onStop(Math.min(nx,maxKwh)); return Math.min(nx,maxKwh); }
+        return nx;
+      });
+    }, 1000);
+    return () => clearInterval(ref.current);
+  }, []);
+  const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  const cost = (kwh*TARIFF).toFixed(2);
+  const pct = Math.min((kwh/maxKwh)*100,100);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>3. Şarj Prosesi</h2>
+      <p style={{ color: "#64748b", fontSize: 13, textAlign: "center", margin: 0 }}>Şarj prosesi aktivdir. Real-time məlumatları izləyin.</p>
+      <Gauge pct={pct} value={kwh.toFixed(2)} unit="kWh" status="Şarj aktivdir"/>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {[["🕐","Müddət",fmt(elapsed)],["⚡","Güc",`${pwr} kW`],["💰","Cari xərc",`${cost} AZN`]].map(([ic,lb,vl]) => (
+          <div key={lb} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f8fafc", borderRadius: 10, padding: "11px 14px" }}>
+            <span style={{ fontSize: 13, color: "#64748b" }}>{ic} {lb}</span>
+            <span style={{ fontWeight: 700, color: "#1e293b", fontSize: 14 }}>{vl}</span>
+          </div>
+        ))}
+      </div>
+      <button onClick={() => { clearInterval(ref.current); onStop(kwh); }}
+        style={{ ...pBtn, background: "#ef4444", boxShadow: "0 4px 20px #ef444430" }}>
+        ⏹ Şarjı Dayandır
+      </button>
+    </div>
+  );
+}
+
+/* ── Result Step ── */
+function ResultStep({ deposit, kwh, onNew, onSessions }) {
+  const cost = (kwh*TARIFF).toFixed(2);
+  const chg = (deposit - parseFloat(cost)).toFixed(2);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <h2 style={{ fontSize: 17, fontWeight: 800, color: "#6366f1", margin: 0, textAlign: "center" }}>4. Nəticə</h2>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>✅</div>
+        <span style={{ color: "#16a34a", fontWeight: 800, fontSize: 15 }}>Uğurlu şəkildə tamamlandı!</span>
+      </div>
+      {[["İstifadə olunan enerji",`${kwh.toFixed(2)} kWh`,"#1e293b"],
+        ["Ümumi xərc",`${cost} AZN`,"#1e293b"],
+        ["Depozit",`${deposit.toFixed(2)} AZN`,"#1e293b"],
+        ["Qalıq məbləğ (geri qaytarılacaq)",`${chg} AZN`,"#16a34a"]
+      ].map(([lb,vl,vc]) => (
+        <div key={lb} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f1f5f9" }}>
+          <span style={{ fontSize: 13, color: "#64748b", maxWidth: "60%" }}>{lb}</span>
+          <span style={{ fontWeight: 700, color: vc, fontSize: 14 }}>{vl}</span>
         </div>
       ))}
+      <button onClick={onNew} style={pBtn}>🔄 Yeni Sessiya</button>
+      <button onClick={onSessions} style={{ ...pBtn, background: "#fff", color: "#475569", border: "1.5px solid #e2e8f0", boxShadow: "none" }}>📋 Sessiyalarım</button>
     </div>
-    <div style={{ marginTop: 20, background: "#eef2ff", borderRadius: 14, padding: "14px 18px", display: "flex", gap: 10 }}>
-      <span>ℹ️</span>
-      <div>
-        <div style={{ fontWeight: 700, color: "#6366f1", fontSize: 14 }}>Demo Versiya Haqqında</div>
-        <div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>Bu sistem demo məqsədlidir. Bütün məlumatlar simulyasiya olunur. Real ödəniş sistemi inteqrasiya edilməyib.</div>
-      </div>
-    </div>
-  </div>
-);
-```
-
-};
-
-/* ── MOBILE ── */
-if (isMobile) return (
-<div style={{ minHeight: “100vh”, background: bg, fontFamily: “‘Segoe UI’, sans-serif”, display: “flex”, flexDirection: “column” }}>
-{/* Sticky top bar */}
-<div style={{ background: “#1e293b”, color: “#fff”, padding: “13px 16px”, display: “flex”, alignItems: “center”, justifyContent: “space-between”, position: “sticky”, top: 0, zIndex: 50 }}>
-<div style={{ display: “flex”, alignItems: “center”, gap: 8 }}>
-<span style={{ fontSize: 20, background: “#6366f1”, borderRadius: 7, padding: “3px 7px” }}>⚡</span>
-<span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
-</div>
-<div style={{ display: “flex”, gap: 10, alignItems: “center” }}>
-<span style={{ fontSize: 11, color: “#94a3b8”, background: “#334155”, padding: “4px 8px”, borderRadius: 6 }}>0.30 AZN/kWh</span>
-<button onClick={() => setTheme(t => t===“light”?“dark”:“light”)} style={{ background: “none”, border: “none”, cursor: “pointer”, fontSize: 18, padding: 0 }}>
-{theme===“light” ? “🌙” : “☀️”}
-</button>
-</div>
-</div>
-
-```
-  {/* Page content with bottom padding for nav bar */}
-  <div style={{ flex: 1, padding: "16px 14px 88px", overflowY: "auto" }}>
-    {renderPage()}
-  </div>
-
-  {/* Fixed bottom nav */}
-  <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: isDark ? "#1e293b" : "#fff", borderTop: `1.5px solid ${borderColor}`, display: "flex", zIndex: 50, boxShadow: "0 -2px 16px #0000001a" }}>
-    {NAV_ITEMS.map(n => (
-      <button key={n.id} onClick={() => navigate(n.id)} style={{
-        flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        gap: 2, padding: "10px 0 8px", border: "none", cursor: "pointer", background: "transparent",
-        color: activeNav===n.id ? "#6366f1" : isDark ? "#64748b" : "#94a3b8",
-        borderTop: activeNav===n.id ? "2.5px solid #6366f1" : "2.5px solid transparent",
-      }}>
-        <span style={{ fontSize: 18 }}>{n.icon}</span>
-        <span style={{ fontSize: 10, fontWeight: activeNav===n.id ? 700 : 500 }}>{n.label}</span>
-      </button>
-    ))}
-  </div>
-</div>
-```
-
-);
-
-/* ── DESKTOP ── */
-return (
-<div style={{ display: “flex”, minHeight: “100vh”, background: bg, fontFamily: “‘Segoe UI’, sans-serif” }}>
-<div style={{ width: 220, background: “#1e293b”, color: “#fff”, display: “flex”, flexDirection: “column”, padding: “0 0 20px”, flexShrink: 0, position: “sticky”, top: 0, height: “100vh” }}>
-<div style={{ padding: “20px 20px 16px”, display: “flex”, alignItems: “center”, gap: 10, borderBottom: “1px solid #334155” }}>
-<span style={{ fontSize: 22, background: “#6366f1”, borderRadius: 8, padding: “4px 8px” }}>⚡</span>
-<span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
-</div>
-<nav style={{ padding: “12px 8px”, flex: 1 }}>
-{NAV_ITEMS.map(n => (
-<button key={n.id} onClick={() => navigate(n.id)} style={{
-width: “100%”, display: “flex”, alignItems: “center”, gap: 10,
-padding: “11px 14px”, borderRadius: 10, border: “none”, cursor: “pointer”,
-background: activeNav===n.id ? “#6366f1” : “transparent”,
-color: activeNav===n.id ? “#fff” : “#94a3b8”,
-fontSize: 14, fontWeight: activeNav===n.id ? 700 : 500,
-marginBottom: 4, transition: “all 0.2s”, textAlign: “left”
-}}><span>{n.icon}</span> {n.label}</button>
-))}
-</nav>
-<div style={{ margin: “0 12px”, background: “#334155”, borderRadius: 12, padding: “12px 14px” }}>
-<div style={{ display: “flex”, alignItems: “center”, gap: 8, marginBottom: 6 }}>
-<span>🧪</span><span style={{ fontWeight: 700, fontSize: 13 }}>Demo Rejimi</span>
-</div>
-<div style={{ fontSize: 12, color: “#94a3b8”, lineHeight: 1.5 }}>Simulyasiya üzərindən işləyir. Real ödəniş alınmır.</div>
-</div>
-</div>
-
-```
-  <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-    <div style={{ background: isDark ? "#1e293b" : "#fff", borderBottom: `1px solid ${borderColor}`, padding: "12px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div style={{ background: "#eef2ff", color: "#6366f1", borderRadius: 8, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>🧪 Demo Mode</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <span style={{ fontSize: 14, color: textSecondary }}>Tarif: <strong style={{ color: "#6366f1" }}>0.30 AZN / kWh</strong></span>
-        <button onClick={() => setTheme(t => t==="light"?"dark":"light")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18 }}>{theme==="light"?"🌙":"☀️"}</button>
-        <div style={{ background: isDark?"#334155":"#f1f5f9", borderRadius: 8, padding: "5px 12px", fontSize: 13, fontWeight: 600, color: textSecondary }}>🌐 AZ</div>
-      </div>
-    </div>
-    <div style={{ flex: 1, padding: "24px 28px 20px", overflowY: "auto" }}>{renderPage()}</div>
-    <div style={{ textAlign: "center", padding: "12px", color: "#94a3b8", fontSize: 12, borderTop: `1px solid ${borderColor}`, background: isDark?"#1e293b":"#fff" }}>
-      © 2026 MQ Charge. Bütün hüquqlar qorunur. ♡
-    </div>
-  </div>
-</div>
-```
-
-);
+  );
 }
+
+/* ── Placeholder ── */
+function Placeholder({ icon, title }) {
+  return (
+    <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 16px" }}>
+      <div style={{ fontSize: 28, marginBottom: 8 }}>{icon}</div>
+      <div style={{ fontWeight: 700, color: "#6366f1", fontSize: 14 }}>{title}</div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════════ */
+function App() {
+  const width = useWidth();
+  const mob = width < 768;
+  const [nav, setNav] = useState("new");
+  const [step, setStep] = useState(1);
+  const [dep, setDep] = useState(0);
+  const [fKwh, setFKwh] = useState(0);
+  const [sessions, setSessions] = useState([]);
+  const [theme, setTheme] = useState("light");
+
+  const dk = theme === "dark";
+  const bg = dk ? "#0f172a" : "#f1f5f9";
+  const cBg = dk ? "#1e293b" : "#fff";
+  const tP = dk ? "#f1f5f9" : "#1e293b";
+  const tS = dk ? "#94a3b8" : "#64748b";
+  const bC = dk ? "#334155" : "#e2e8f0";
+
+  const stop = (kwh) => {
+    setSessions(p => [{ id:`S-${p.length+1}`, date: new Date().toLocaleString("az-AZ"), kwh: kwh.toFixed(2), cost: (kwh*TARIFF).toFixed(2), station: STATION_ID }, ...p]);
+    setFKwh(kwh); setStep(4);
+  };
+  const newSess = () => { setStep(1); setDep(0); setFKwh(0); setNav("new"); };
+  const go = id => { setNav(id); if (id==="new") newSess(); };
+
+  const Page = () => {
+    if (nav === "sessions") return (
+      <div>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Sessiyalarım</h2>
+        {sessions.length === 0
+          ? <div style={{ textAlign: "center", color: tS, padding: 40, background: cBg, borderRadius: 14, border: `1px solid ${bC}` }}>Hələ sessiya yoxdur.</div>
+          : sessions.map(s => (
+            <div key={s.id} style={{ background: cBg, borderRadius: 14, padding: "14px 16px", marginBottom: 10, border: `1px solid ${bC}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontWeight: 700, color: tP }}>{s.id}</div>
+                <div style={{ fontSize: 12, color: tS, marginTop: 2 }}>{s.date} · {s.station}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontWeight: 800, color: "#6366f1" }}>{s.kwh} kWh</div>
+                <div style={{ fontSize: 13, color: tS }}>{s.cost} AZN</div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    );
+    if (nav === "tariffs") return (
+      <div>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Tariflər</h2>
+        {[["0.30 AZN/kWh","Standart gündüz tarifi (06:00–22:00)","#6366f1"],
+          ["0.20 AZN/kWh","Gecə tarifi (22:00–06:00)","#818cf8"]
+        ].map(([r,d,c]) => (
+          <div key={r} style={{ background: cBg, borderRadius: 14, padding: "18px 16px", marginBottom: 12, border: `1px solid ${bC}` }}>
+            <div style={{ fontSize: 26, fontWeight: 900, color: c }}>{r}</div>
+            <div style={{ color: tS, marginTop: 4, fontSize: 14 }}>{d}</div>
+          </div>
+        ))}
+      </div>
+    );
+    if (nav === "stations") return (
+      <div>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Stansiyalar</h2>
+        <div style={{ background: cBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${bC}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div style={{ fontWeight: 800, color: tP, fontSize: 16 }}>{STATION_ID}</div>
+              <div style={{ color: tS, fontSize: 13, marginTop: 3 }}>Bakı, Nərimanov r., AzərGold, 12</div>
+            </div>
+            <div style={{ background: "#dcfce7", color: "#16a34a", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700 }}>Aktiv</div>
+          </div>
+          <div style={{ marginTop: 12, fontSize: 13, color: tS }}>Güc: 7.2 kW · GB/T AC · 24/7</div>
+        </div>
+      </div>
+    );
+    if (nav === "about") return (
+      <div>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: tP, marginBottom: 14 }}>Haqqında</h2>
+        <div style={{ background: cBg, borderRadius: 14, padding: "18px 16px", border: `1px solid ${bC}`, color: tS, fontSize: 14, lineHeight: 1.8 }}>
+          <p style={{ marginBottom: 8 }}>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p>
+          <p style={{ marginBottom: 8 }}>Versiya: <strong style={{ color: "#6366f1" }}>1.0.0</strong></p>
+          <p>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>
+        </div>
+      </div>
+    );
+
+    /* New Session — mobile: single card */
+    if (mob) {
+      const cards = [
+        <QRStep onStart={() => setStep(2)}/>,
+        <DepositStep onPay={d => { setDep(d); setStep(3); }}/>,
+        <ChargingStep deposit={dep} onStop={stop}/>,
+        <ResultStep deposit={dep} kwh={fKwh} onNew={newSess} onSessions={() => go("sessions")}/>
+      ];
+      return (
+        <div>
+          <Steps cur={step} mob/>
+          <div style={{ background: cBg, borderRadius: 18, padding: "20px 16px", border: "2px solid #6366f1", boxShadow: "0 8px 32px #6366f120", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }}/>
+            {cards[step-1]}
+          </div>
+          <div style={{ marginTop: 14, background: "#eef2ff", borderRadius: 12, padding: "11px 14px", display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <span>ℹ️</span>
+            <div style={{ fontSize: 12, color: "#6366f1" }}><strong>Demo:</strong> Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.</div>
+          </div>
+        </div>
+      );
+    }
+
+    /* Desktop: 4-col grid */
+    return (
+      <div>
+        <Steps cur={step} mob={false}/>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+          {[1,2,3,4].map(s => (
+            <div key={s} style={{
+              background: cBg, borderRadius: 18, padding: 22,
+              boxShadow: step===s ? "0 8px 32px #6366f120" : "0 2px 12px #0000000a",
+              border: step===s ? "2px solid #6366f1" : `1.5px solid ${bC}`,
+              opacity: step<s ? 0.5 : 1, transition: "all 0.3s",
+              position: "relative", overflow: "hidden"
+            }}>
+              {step===s && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#6366f1,#818cf8)" }}/>}
+              {s===1 && <QRStep onStart={() => setStep(2)}/>}
+              {s===2 && (step>=2 ? <DepositStep onPay={d=>{ setDep(d); setStep(3); }}/> : <Placeholder icon="💳" title="2. Depozit"/>)}
+              {s===3 && (step===3 ? <ChargingStep deposit={dep} onStop={stop}/> : step>3 ? <Placeholder icon="✅" title="Tamamlandı"/> : <Placeholder icon="⚡" title="3. Şarj Prosesi"/>)}
+              {s===4 && (step===4 ? <ResultStep deposit={dep} kwh={fKwh} onNew={newSess} onSessions={() => go("sessions")}/> : <Placeholder icon="🏁" title="4. Nəticə"/>)}
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 20, background: "#eef2ff", borderRadius: 14, padding: "14px 18px", display: "flex", gap: 10 }}>
+          <span>ℹ️</span>
+          <div>
+            <div style={{ fontWeight: 700, color: "#6366f1", fontSize: 14 }}>Demo Versiya Haqqında</div>
+            <div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>Bu sistem demo məqsədlidir. Bütün məlumatlar simulyasiya olunur. Real ödəniş sistemi inteqrasiya edilməyib.</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ── MOBILE LAYOUT ── */
+  if (mob) return (
+    <div style={{ minHeight: "100vh", background: bg, display: "flex", flexDirection: "column" }}>
+      <div style={{ background: "#1e293b", color: "#fff", padding: "13px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 20, background: "#6366f1", borderRadius: 7, padding: "3px 7px" }}>⚡</span>
+          <span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
+        </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <span style={{ fontSize: 11, color: "#94a3b8", background: "#334155", padding: "4px 8px", borderRadius: 6 }}>0.30 AZN/kWh</span>
+          <button onClick={() => setTheme(t => t==="light"?"dark":"light")}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, padding: 0 }}>
+            {theme==="light" ? "🌙" : "☀️"}
+          </button>
+        </div>
+      </div>
+      <div style={{ flex: 1, padding: "16px 14px 88px", overflowY: "auto" }}>
+        <Page/>
+      </div>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: dk?"#1e293b":"#fff", borderTop: `1.5px solid ${bC}`, display: "flex", zIndex: 50, boxShadow: "0 -2px 16px #0000001a" }}>
+        {NAV_ITEMS.map(n => (
+          <button key={n.id} onClick={() => go(n.id)} style={{
+            flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+            justifyContent: "center", gap: 2, padding: "10px 0 8px",
+            border: "none", cursor: "pointer", background: "transparent",
+            color: nav===n.id ? "#6366f1" : dk?"#64748b":"#94a3b8",
+            borderTop: nav===n.id ? "2.5px solid #6366f1" : "2.5px solid transparent"
+          }}>
+            <span style={{ fontSize: 18 }}>{n.icon}</span>
+            <span style={{ fontSize: 10, fontWeight: nav===n.id?700:500 }}>{n.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  /* ── DESKTOP LAYOUT ── */
+  return (
+    <div style={{ display: "flex", minHeight: "100vh", background: bg }}>
+      <div style={{ width: 220, background: "#1e293b", color: "#fff", display: "flex", flexDirection: "column", padding: "0 0 20px", flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
+        <div style={{ padding: "20px 20px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #334155" }}>
+          <span style={{ fontSize: 22, background: "#6366f1", borderRadius: 8, padding: "4px 8px" }}>⚡</span>
+          <span style={{ fontWeight: 800, fontSize: 16 }}>MQ Charge</span>
+        </div>
+        <nav style={{ padding: "12px 8px", flex: 1 }}>
+          {NAV_ITEMS.map(n => (
+            <button key={n.id} onClick={() => go(n.id)} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 10,
+              padding: "11px 14px", borderRadius: 10, border: "none", cursor: "pointer",
+              background: nav===n.id ? "#6366f1" : "transparent",
+              color: nav===n.id ? "#fff" : "#94a3b8",
+              fontSize: 14, fontWeight: nav===n.id?700:500,
+              marginBottom: 4, transition: "all 0.2s", textAlign: "left"
+            }}><span>{n.icon}</span> {n.label}</button>
+          ))}
+        </nav>
+        <div style={{ margin: "0 12px", background: "#334155", borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <span>🧪</span><span style={{ fontWeight: 700, fontSize: 13 }}>Demo Rejimi</span>
+          </div>
+          <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>Simulyasiya üzərindən işləyir. Real ödəniş alınmır.</div>
+        </div>
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div style={{ background: dk?"#1e293b":"#fff", borderBottom: `1px solid ${bC}`, padding: "12px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ background: "#eef2ff", color: "#6366f1", borderRadius: 8, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>🧪 Demo Mode</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <span style={{ fontSize: 14, color: tS }}>Tarif: <strong style={{ color: "#6366f1" }}>0.30 AZN / kWh</strong></span>
+            <button onClick={() => setTheme(t => t==="light"?"dark":"light")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18 }}>{theme==="light"?"🌙":"☀️"}</button>
+            <div style={{ background: dk?"#334155":"#f1f5f9", borderRadius: 8, padding: "5px 12px", fontSize: 13, fontWeight: 600, color: tS }}>🌐 AZ</div>
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: "24px 28px 20px", overflowY: "auto" }}><Page/></div>
+        <div style={{ textAlign: "center", padding: "12px", color: "#94a3b8", fontSize: 12, borderTop: `1px solid ${bC}`, background: dk?"#1e293b":"#fff" }}>
+          © 2026 MQ Charge. Bütün hüquqlar qorunur. ♡
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+```
+
+  </script>
+</body>
+</html>
