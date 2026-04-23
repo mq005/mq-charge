@@ -1,417 +1,531 @@
 <!DOCTYPE html>
-
 <html lang="az">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MQ Charge</title>
-<meta name="theme-color" content="#1e293b"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif}
-button{font-family:inherit;cursor:pointer}
-input{font-family:inherit}
-.app{min-height:100vh;background:#f1f5f9;display:flex;flex-direction:column}
-.topbar{background:#1e293b;color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px}
-.logo-icon{font-size:20px;background:#6366f1;border-radius:7px;padding:3px 8px}
-.tarif-badge{font-size:11px;color:#94a3b8;background:#334155;padding:4px 8px;border-radius:6px}
-.theme-btn{background:none;border:none;font-size:18px;padding:0;color:#fff}
-.content{flex:1;padding:16px 14px 88px;overflow-y:auto}
-.bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #e2e8f0;display:flex;z-index:50;box-shadow:0 -2px 16px rgba(0,0,0,.1)}
-.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 0 8px;border:none;background:transparent;color:#94a3b8;border-top:2.5px solid transparent;font-size:10px;font-weight:500}
-.navbtn.active{color:#6366f1;border-top-color:#6366f1;font-weight:700}
-.navbtn .icon{font-size:18px}
-.card{background:#fff;border-radius:18px;padding:20px 16px;border:2px solid #6366f1;box-shadow:0 8px 32px rgba(99,102,241,.12);position:relative;overflow:hidden}
-.card-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#818cf8)}
-.info-box{margin-top:14px;background:#eef2ff;border-radius:12px;padding:11px 14px;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#6366f1}
-.steps{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.step-col{display:flex;flex-direction:column;align-items:center;gap:4px}
-.step-dot{width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;transition:all .3s;flex-shrink:0}
-.step-dot.active{background:#6366f1;color:#fff;box-shadow:0 0 0 3px #c7d2fe}
-.step-dot.done{background:#6366f1;color:#fff}
-.step-label{font-size:9px;color:#94a3b8;white-space:nowrap}
-.step-label.active{color:#6366f1;font-weight:700}
-.step-line{width:28px;height:2px;background:#e2e8f0;margin-bottom:18px;flex-shrink:0;transition:background .3s}
-.step-line.done{background:#6366f1}
-.section-title{font-size:17px;font-weight:800;color:#6366f1;text-align:center;margin-bottom:8px}
-.section-desc{color:#64748b;font-size:13px;text-align:center;margin-bottom:14px}
-.amt-label{text-align:center;font-size:12px;color:#94a3b8;margin-bottom:8px}
-.amt-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px}
-.amt-display{font-size:34px;font-weight:900;color:#1e293b;min-width:56px;text-align:center}
-.adj-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;font-size:22px;color:#475569;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
-.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
-.chip{padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#475569;min-width:60px}
-.chip.sel{border:2px solid #6366f1;background:#eef2ff;color:#6366f1}
-.pay-label{font-size:12px;color:#94a3b8;margin-bottom:8px}
-.pay-methods{display:flex;gap:8px;margin-bottom:10px}
-.pay-btn{flex:1;padding:11px 8px;border-radius:10px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#475569}
-.pay-btn.sel{border:2px solid #6366f1;background:#eef2ff;color:#6366f1}
-.card-input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:15px;outline:none;letter-spacing:2px;font-family:monospace;margin-bottom:10px}
-.iban-box{background:#f8fafc;border-radius:10px;padding:10px 14px;font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.8}
-.dep-note{background:#eef2ff;border-radius:10px;padding:10px 14px;font-size:12px;color:#6366f1;display:flex;gap:8px;margin-bottom:14px}
-.pbtn{background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;border-radius:13px;padding:15px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(99,102,241,.25);width:100%;margin-bottom:8px}
-.pbtn:disabled{background:#a5b4fc;cursor:default}
-.pbtn.red{background:#ef4444;box-shadow:0 4px 20px rgba(239,68,68,.18)}
-.pbtn.outline{background:#fff;color:#475569;border:1.5px solid #e2e8f0;box-shadow:none}
-.gauge-wrap{position:relative;width:180px;height:180px;margin:0 auto 14px}
-.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.gauge-val{font-size:30px;font-weight:900;color:#1e293b;line-height:1}
-.gauge-unit{font-size:13px;color:#64748b;font-weight:600}
-.gauge-status{margin-top:5px;font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 10px;border-radius:20px;font-weight:700}
-.stat-row{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:10px;padding:11px 14px;margin-bottom:8px}
-.stat-label{font-size:13px;color:#64748b}
-.stat-val{font-weight:700;color:#1e293b;font-size:14px}
-.result-icon{width:56px;height:56px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 6px}
-.result-ok{color:#16a34a;font-weight:800;font-size:15px;text-align:center;margin-bottom:14px}
-.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9}
-.result-label{font-size:13px;color:#64748b;max-width:60%}
-.result-val{font-weight:700;font-size:14px}
-.sess-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
-.sess-id{font-weight:700;color:#1e293b}
-.sess-meta{font-size:12px;color:#94a3b8;margin-top:2px}
-.sess-kwh{font-weight:800;color:#6366f1;text-align:right}
-.sess-cost{font-size:13px;color:#64748b}
-.empty-state{text-align:center;color:#94a3b8;padding:40px;background:#fff;border-radius:14px;border:1px solid #e2e8f0}
-.tariff-card{background:#fff;border-radius:14px;padding:18px 16px;margin-bottom:12px;border:1px solid #e2e8f0}
-.tariff-rate{font-size:26px;font-weight:900}
-.tariff-desc{color:#64748b;margin-top:4px;font-size:14px}
-.station-card{background:#fff;border-radius:14px;padding:18px 16px;border:1px solid #e2e8f0}
-.station-header{display:flex;justify-content:space-between;align-items:flex-start}
-.station-name{font-weight:800;color:#1e293b;font-size:16px}
-.station-addr{color:#64748b;font-size:13px;margin-top:3px}
-.active-badge{background:#dcfce7;color:#16a34a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
-.station-specs{margin-top:12px;font-size:13px;color:#64748b}
-.about-card{background:#fff;border-radius:14px;padding:18px 16px;border:1px solid #e2e8f0;color:#64748b;font-size:14px;line-height:1.8}
-.page-title{font-size:18px;font-weight:800;color:#1e293b;margin-bottom:14px}
-/* dark */
-.dark .app{background:#0f172a}
-.dark .bottomnav{background:#1e293b;border-top-color:#334155}
-.dark .navbtn{color:#64748b}
-.dark .navbtn.active{color:#6366f1}
-.dark .card,.dark .sess-card,.dark .tariff-card,.dark .station-card,.dark .about-card,.dark .empty-state{background:#1e293b;border-color:#334155}
-.dark .page-title,.dark .sess-id,.dark .station-name{color:#f1f5f9}
-.dark .stat-row{background:#0f172a}
-.dark .stat-val,.dark .gauge-val,.dark .amt-display{color:#f1f5f9}
-.dark .chip{background:#1e293b;border-color:#334155;color:#94a3b8}
-.dark .chip.sel{background:#1e1b4b;border-color:#6366f1;color:#6366f1}
-.dark .adj-btn,.dark .pay-btn{background:#1e293b;border-color:#334155;color:#94a3b8}
-.dark .pay-btn.sel{background:#1e1b4b;border-color:#6366f1;color:#6366f1}
-.dark .card-input,.dark .iban-box{background:#0f172a;color:#f1f5f9;border-color:#334155}
-.dark .result-row{border-bottom-color:#334155}
-.dark .sess-cost,.dark .tariff-desc,.dark .station-addr,.dark .station-specs{color:#94a3b8}
-/* desktop */
-@media(min-width:768px){
-  .app{flex-direction:row}
-  .topbar,.bottomnav{display:none}
-  .content{padding:24px 28px 20px}
-  .sidebar{width:220px;background:#1e293b;color:#fff;display:flex;flex-direction:column;padding:0 0 20px;flex-shrink:0;position:sticky;top:0;height:100vh}
-  .sb-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155;font-weight:800;font-size:16px}
-  .sb-logo-icon{font-size:22px;background:#6366f1;border-radius:8px;padding:4px 8px}
-  .sb-nav{padding:12px 8px;flex:1}
-  .sb-btn{width:100%;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:14px;font-weight:500;margin-bottom:4px;transition:all .2s;text-align:left}
-  .sb-btn.active{background:#6366f1;color:#fff;font-weight:700}
-  .sb-demo{margin:0 12px;background:#334155;border-radius:12px;padding:12px 14px}
-  .sb-demo-title{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:700;font-size:13px}
-  .sb-demo-txt{font-size:12px;color:#94a3b8;line-height:1.5}
-  .desktop-main{flex:1;display:flex;flex-direction:column;min-width:0}
-  .dsk-header{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between}
-  .demo-badge{background:#eef2ff;color:#6366f1;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700}
-  .hdr-right{display:flex;align-items:center;gap:16px}
-  .hdr-tarif{font-size:14px;color:#64748b}
-  .lang-badge{background:#f1f5f9;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;color:#475569}
-  .dsk-footer{text-align:center;padding:12px;color:#94a3b8;font-size:12px;border-top:1px solid #e2e8f0;background:#fff}
-  .dark .dsk-header,.dark .dsk-footer{background:#1e293b;border-color:#334155}
-  .dark .lang-badge{background:#334155;color:#94a3b8}
-  .dark .hdr-tarif{color:#94a3b8}
-  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .gcrd{background:#fff;border-radius:18px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.04);border:1.5px solid #e2e8f0;transition:all .3s;position:relative;overflow:hidden}
-  .gcrd.act{box-shadow:0 8px 32px rgba(99,102,241,.12);border:2px solid #6366f1}
-  .gcrd.dim{opacity:.5}
-  .dark .gcrd{background:#1e293b;border-color:#334155}
-  .ph{text-align:center;color:#94a3b8;padding:24px 16px}
-  .ph-icon{font-size:28px;margin-bottom:8px}
-  .ph-title{font-weight:700;color:#6366f1;font-size:14px}
-  .demo-info{margin-top:20px;background:#eef2ff;border-radius:14px;padding:14px 18px;display:flex;gap:10px}
-  .di-title{font-weight:700;color:#6366f1;font-size:14px}
-  .di-text{color:#64748b;font-size:13px;margin-top:4px}
-  .step-dot{width:36px;height:36px;font-size:14px}
-  .step-label{font-size:11px}
-  .step-line{width:60px}
-  .card{border:2px solid #6366f1}
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; }
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+
+/* Layout */
+#wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+#topbar { background: #1e293b; color: #fff; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 99; }
+#logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; }
+.logo-bolt { background: #6366f1; border-radius: 7px; padding: 3px 8px; font-size: 18px; }
+.tarif-pill { background: #334155; color: #94a3b8; font-size: 11px; padding: 4px 8px; border-radius: 6px; }
+#theme-btn { background: none; border: none; color: #fff; font-size: 18px; padding: 4px; }
+#main-content { flex: 1; padding: 16px 14px 90px; overflow-y: auto; }
+#bottomnav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1.5px solid #e2e8f0; display: flex; z-index: 99; box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
+.nb { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 7px; border: none; background: none; color: #94a3b8; font-size: 10px; gap: 2px; border-top: 2.5px solid transparent; }
+.nb.on { color: #6366f1; border-top-color: #6366f1; font-weight: 700; }
+.nb-ic { font-size: 18px; }
+
+/* Cards */
+.card { background: #fff; border-radius: 16px; padding: 20px 16px; border: 2px solid #6366f1; box-shadow: 0 6px 24px rgba(99,102,241,.1); position: relative; overflow: hidden; margin-bottom: 14px; }
+.card-top-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #6366f1, #818cf8); }
+.info-note { background: #eef2ff; border-radius: 10px; padding: 11px 14px; font-size: 12px; color: #6366f1; display: flex; gap: 8px; }
+
+/* Steps */
+#steps { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.s-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.s-dot { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; transition: all .3s; }
+.s-dot.act { background: #6366f1; color: #fff; box-shadow: 0 0 0 3px #c7d2fe; }
+.s-dot.dn { background: #6366f1; color: #fff; }
+.s-lbl { font-size: 9px; color: #94a3b8; white-space: nowrap; }
+.s-lbl.act { color: #6366f1; font-weight: 700; }
+.s-line { width: 30px; height: 2px; background: #e2e8f0; margin-bottom: 18px; flex-shrink: 0; }
+.s-line.dn { background: #6366f1; }
+
+/* Titles */
+.step-title { font-size: 17px; font-weight: 800; color: #6366f1; text-align: center; margin-bottom: 8px; }
+.step-desc { color: #64748b; font-size: 13px; text-align: center; margin-bottom: 14px; }
+
+/* QR */
+.qr-frame { border: 2px solid #6366f1; border-radius: 12px; padding: 10px; background: #f8fafc; display: inline-block; margin-bottom: 12px; }
+.qr-id { background: #f1f5f9; border-radius: 8px; padding: 7px 16px; font-size: 13px; color: #475569; margin-bottom: 8px; }
+
+/* Buttons */
+.pbtn { width: 100%; padding: 14px; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(99,102,241,.3); margin-bottom: 8px; }
+.pbtn.red { background: #ef4444; box-shadow: 0 4px 16px rgba(239,68,68,.25); }
+.pbtn.ghost { background: #fff; color: #475569; border: 1.5px solid #e2e8f0; box-shadow: none; }
+.pbtn:disabled { background: #a5b4fc; cursor: default; }
+
+/* Amount */
+.amt-lbl { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+.amt-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px; }
+.adj { width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid #e2e8f0; background: #fff; font-size: 22px; color: #475569; font-weight: 700; }
+.amt-num { font-size: 36px; font-weight: 900; color: #1e293b; min-width: 60px; text-align: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.chip { padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; min-width: 62px; }
+.chip.on { border: 2px solid #6366f1; background: #eef2ff; color: #6366f1; }
+
+/* Pay */
+.pay-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.pmb { flex: 1; padding: 11px 8px; border-radius: 10px; font-size: 13px; font-weight: 600; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; }
+.pmb.on { border: 2px solid #6366f1; background: #eef2ff; color: #6366f1; }
+.card-inp { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 15px; letter-spacing: 2px; font-family: monospace; outline: none; margin-bottom: 10px; }
+.iban-box { background: #f8fafc; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #64748b; line-height: 1.8; margin-bottom: 10px; }
+.dep-note { background: #eef2ff; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #6366f1; margin-bottom: 14px; }
+
+/* Gauge */
+.gauge-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 14px; }
+.gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.g-val { font-size: 30px; font-weight: 900; color: #1e293b; line-height: 1; }
+.g-unit { font-size: 13px; color: #64748b; font-weight: 600; }
+.g-status { margin-top: 5px; font-size: 11px; background: #dcfce7; color: #16a34a; padding: 2px 10px; border-radius: 20px; font-weight: 700; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; }
+.s-lbl2 { font-size: 13px; color: #64748b; }
+.s-val { font-weight: 700; color: #1e293b; font-size: 14px; }
+
+/* Result */
+.res-icon { width: 56px; height: 56px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 6px; }
+.res-ok { color: #16a34a; font-weight: 800; font-size: 15px; text-align: center; margin-bottom: 14px; }
+.res-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.res-lbl { font-size: 13px; color: #64748b; max-width: 58%; }
+.res-val { font-weight: 700; font-size: 14px; }
+
+/* Sessions */
+.sess-card { background: #fff; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.empty-msg { text-align: center; color: #94a3b8; padding: 40px 20px; background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; }
+.page-title { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 14px; }
+.tariff-card { background: #fff; border-radius: 14px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+.about-card { background: #fff; border-radius: 14px; padding: 18px 16px; border: 1px solid #e2e8f0; color: #64748b; font-size: 14px; line-height: 1.8; }
 </style>
 </head>
 <body>
-<div id="app"></div>
+
+<div id="wrapper">
+  <div id="topbar">
+    <div id="logo">
+      <span class="logo-bolt">⚡</span>
+      MQ Charge
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="tarif-pill">0.30 AZN/kWh</span>
+      <button id="theme-btn">🌙</button>
+    </div>
+  </div>
+
+  <div id="main-content"></div>
+
+  <nav id="bottomnav"></nav>
+</div>
+
 <script>
-var T=0.30, SID="AZE-001";
-var NAVS=[{id:"new",ic:"⚡",lb:"Sessiya"},{id:"sessions",ic:"📋",lb:"Tarixçə"},{id:"tariffs",ic:"💰",lb:"Tariflər"},{id:"stations",ic:"🗺️",lb:"Stansiya"},{id:"about",ic:"ℹ️",lb:"Haqqında"}];
-var S={nav:"new",step:1,dep:0,fkwh:0,sessions:[],theme:"light",amt:10,pm:"card",cn:"",busy:false,el:0,kwh:0,iv:null};
-var mob=window.innerWidth<768;
-window.addEventListener("resize",function(){mob=window.innerWidth<768;R();});
+// ── Config ──
+var TARIFF = 0.30;
+var STATION = "AZE-001";
+var NAVS = [
+  { id: "new",      ic: "⚡", lb: "Sessiya"  },
+  { id: "sessions", ic: "📋", lb: "Tarixçə"  },
+  { id: "tariffs",  ic: "💰", lb: "Tariflər" },
+  { id: "stations", ic: "🗺️", lb: "Stansiya"},
+  { id: "about",    ic: "ℹ️", lb: "Haqqında"}
+];
 
-function h(tag,cls,ch,st){
-var e=document.createElement(tag);
-if(cls)e.className=cls;
-if(st)Object.assign(e.style,st);
-if(ch){if(!Array.isArray(ch))ch=[ch];ch.forEach(function(c){if(c==null||c===false)return;if(typeof c===“string”||typeof c===“number”)e.appendChild(document.createTextNode(String(c)));else e.appendChild(c);})}
-return e;
+// ── State ──
+var nav     = "new";
+var step    = 1;
+var deposit = 0;
+var finalKwh = 0;
+var sessions = [];
+var amt     = 10;
+var payMethod = "card";
+var cardNum = "";
+var busy    = false;
+var kwh     = 0;
+var elapsed = 0;
+var timer   = null;
+
+// ── DOM helpers ──
+function el(tag) { return document.createElement(tag); }
+function div(cls) { var d = el("div"); if (cls) d.className = cls; return d; }
+function txt(str) { return document.createTextNode(String(str)); }
+function add(parent) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  args.forEach(function(c) {
+    if (c == null) return;
+    if (typeof c === "string" || typeof c === "number") parent.appendChild(txt(c));
+    else parent.appendChild(c);
+  });
+  return parent;
 }
-function d(cls,ch,st){return h(“div”,cls,ch,st);}
-function btn(cls,txt,fn,dis){var b=h(“button”,cls,[txt]);if(fn)b.addEventListener(“click”,fn);if(dis)b.disabled=true;return b;}
-function fmt(s){return String(Math.floor(s/60)).padStart(2,“0”)+”:”+String(s%60).padStart(2,“0”);}
-
-function set(p){Object.assign(S,p);R();}
-
-function buildGauge(pct,val,unit,status){
-var r=72,c=2*Math.PI*r,dash=c*Math.min(pct,100)/100;
-var col=pct<40?”#22c55e”:pct<75?”#f59e0b”:”#ef4444”;
-var ns=“http://www.w3.org/2000/svg”;
-var wrap=d(“gauge-wrap”);
-var svg=document.createElementNS(ns,“svg”);
-svg.setAttribute(“width”,“180”);svg.setAttribute(“height”,“180”);svg.style.transform=“rotate(-90deg)”;
-function circ(stroke,sw,da){var el=document.createElementNS(ns,“circle”);el.setAttribute(“cx”,“90”);el.setAttribute(“cy”,“90”);el.setAttribute(“r”,String(r));el.setAttribute(“fill”,“none”);el.setAttribute(“stroke”,stroke);el.setAttribute(“stroke-width”,String(sw));if(da)el.setAttribute(“stroke-dasharray”,da);el.setAttribute(“stroke-linecap”,“round”);return el;}
-svg.appendChild(circ(”#e2e8f0”,11,null));
-var arc=circ(col,11,dash+” “+c);
-arc.style.transition=“stroke-dasharray 0.5s ease”;
-svg.appendChild(arc);
-wrap.appendChild(svg);
-wrap.appendChild(d(“gauge-center”,[d(””,[“⚡”],{fontSize:“16px”}),d(“gauge-val”,val),d(“gauge-unit”,unit),d(“gauge-status”,status)]));
-return wrap;
+function fmt(s) {
+  return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+}
+function mkBtn(cls, label, fn) {
+  var b = el("button");
+  b.className = cls;
+  b.innerHTML = label;
+  if (fn) b.addEventListener("click", fn);
+  return b;
 }
 
-function buildSteps(cur){
-var steps=[“QR”,“Depozit”,“Şarj”,“Nəticə”];
-var wrap=d(“steps”);
-steps.forEach(function(s,i){
-var n=i+1,act=n===cur,dn=n<cur;
-var col=d(“step-col”,[d(“step-dot”+(act?” active”:dn?” done”:””),dn?“✓”:String(n)),d(“step-label”+(act?” active”:””),s)]);
-wrap.appendChild(col);
-if(i<3){var ln=d(“step-line”+(dn?” done”:””));wrap.appendChild(ln);}
+// ── Gauge ──
+function makeGauge(pct, val, unit, status) {
+  var r = 72, c = 2 * Math.PI * r;
+  var dash = c * Math.min(pct, 100) / 100;
+  var color = pct < 40 ? "#22c55e" : pct < 75 ? "#f59e0b" : "#ef4444";
+  var ns = "http://www.w3.org/2000/svg";
+  var wrap = div("gauge-wrap");
+  var svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", "180"); svg.setAttribute("height", "180");
+  svg.style.transform = "rotate(-90deg)";
+  function circle(stroke, sw, da) {
+    var ci = document.createElementNS(ns, "circle");
+    ci.setAttribute("cx", "90"); ci.setAttribute("cy", "90");
+    ci.setAttribute("r", String(r)); ci.setAttribute("fill", "none");
+    ci.setAttribute("stroke", stroke);
+    ci.setAttribute("stroke-width", String(sw));
+    ci.setAttribute("stroke-linecap", "round");
+    if (da) ci.setAttribute("stroke-dasharray", da);
+    return ci;
+  }
+  svg.appendChild(circle("#e2e8f0", 11, null));
+  var arc = circle(color, 11, dash + " " + c);
+  arc.style.transition = "stroke-dasharray 0.5s ease";
+  svg.appendChild(arc);
+  wrap.appendChild(svg);
+  var center = div("gauge-center");
+  add(center, "⚡");
+  var gv = div("g-val"); gv.textContent = val;
+  var gu = div("g-unit"); gu.textContent = unit;
+  var gs = div("g-status"); gs.textContent = status;
+  add(center, gv, gu, gs);
+  wrap.appendChild(center);
+  return wrap;
+}
+
+// ── Steps ──
+function makeSteps() {
+  var names = ["QR", "Depozit", "Şarj", "Nəticə"];
+  var wrap = div(""); wrap.id = "steps";
+  names.forEach(function(name, i) {
+    var n = i + 1;
+    var active = n === step, done = n < step;
+    var col = div("s-wrap");
+    var dot = div("s-dot" + (active ? " act" : done ? " dn" : ""));
+    dot.textContent = done ? "✓" : String(n);
+    var lbl = div("s-lbl" + (active ? " act" : ""));
+    lbl.textContent = name;
+    add(col, dot, lbl);
+    wrap.appendChild(col);
+    if (i < 3) {
+      var line = div("s-line" + (done ? " dn" : ""));
+      wrap.appendChild(line);
+    }
+  });
+  return wrap;
+}
+
+// ── QR Step ──
+function makeQR() {
+  var pat = [
+    [1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],
+    [1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]
+  ];
+  var ns = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", "150"); svg.setAttribute("height", "150");
+  svg.setAttribute("viewBox", "0 0 160 160");
+  for (var row = 0; row < 7; row++) {
+    for (var col = 0; col < 7; col++) {
+      var rect = document.createElementNS(ns, "rect");
+      rect.setAttribute("x", String(col * 22 + 4));
+      rect.setAttribute("y", String(row * 22 + 4));
+      rect.setAttribute("width", "20"); rect.setAttribute("height", "20");
+      rect.setAttribute("fill", pat[row][col] ? "#1e293b" : "#f8fafc");
+      rect.setAttribute("rx", "2");
+      svg.appendChild(rect);
+    }
+  }
+  for (var i = 0; i < 100; i++) {
+    var rr = Math.floor(i / 10), cc = i % 10;
+    var x = cc * 9 + 30, y = rr * 9 + 30;
+    if (x > 25 && x < 130 && y > 25 && y < 130 &&
+        !(x < 60 && y < 60) && !(x > 100 && y < 60) && !(x < 60 && y > 100)) {
+      if ((rr * 13 + cc * 7) % 3 === 0) {
+        var sq = document.createElementNS(ns, "rect");
+        sq.setAttribute("x", String(x)); sq.setAttribute("y", String(y));
+        sq.setAttribute("width", "8"); sq.setAttribute("height", "8");
+        sq.setAttribute("fill", "#1e293b"); sq.setAttribute("rx", "1");
+        svg.appendChild(sq);
+      }
+    }
+  }
+  var frame = div("qr-frame"); frame.appendChild(svg);
+  var wrap = div("");
+  wrap.style.display = "flex";
+  wrap.style.flexDirection = "column";
+  wrap.style.alignItems = "center";
+  wrap.style.gap = "10px";
+
+  var t = div("step-title"); t.textContent = "1. QR Scan";
+  var desc = div("step-desc"); desc.textContent = "Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.";
+  var sid = div("qr-id"); sid.innerHTML = "Stansiya ID: <strong style='color:#6366f1'>" + STATION + "</strong>";
+  var orEl = div(""); orEl.textContent = "və ya"; orEl.style.color = "#94a3b8"; orEl.style.fontSize = "12px";
+  var btn = mkBtn("pbtn", "▶ Demo olaraq başla", function() { step = 2; render(); });
+  btn.style.width = "100%";
+
+  add(wrap, t, desc, frame, sid, orEl, btn);
+  return wrap;
+}
+
+// ── Deposit Step ──
+function makeDeposit() {
+  var wrap = div(""); wrap.style.cssText = "display:flex;flex-direction:column;gap:12px";
+
+  var t = div("step-title"); t.textContent = "2. Depozit";
+  var desc = div("step-desc"); desc.textContent = "Şarjə başlamaq üçün depozit məbləğini daxil edin.";
+  wrap.appendChild(t); wrap.appendChild(desc);
+
+  // Amount
+  var lbl = div("amt-lbl"); lbl.textContent = "Depozit məbləği (AZN)";
+  var display = div("amt-num"); display.textContent = String(amt);
+  var minus = mkBtn("adj", "−", function() { amt = Math.max(1, amt - 1); render(); });
+  var plus  = mkBtn("adj", "+", function() { amt = Math.min(500, amt + 1); render(); });
+  var row = div("amt-row"); add(row, minus, display, plus);
+  wrap.appendChild(lbl); wrap.appendChild(row);
+
+  var chips = div("chips");
+  [5, 10, 20, 50, 100].forEach(function(a) {
+    var c = mkBtn("chip" + (amt === a ? " on" : ""), a + " AZN", function() { amt = a; render(); });
+    chips.appendChild(c);
+  });
+  wrap.appendChild(chips);
+
+  // Pay method
+  var plbl = div(""); plbl.textContent = "Ödəniş üsulu"; plbl.style.cssText = "font-size:12px;color:#94a3b8";
+  wrap.appendChild(plbl);
+  var prow = div("pay-row");
+  var b1 = mkBtn("pmb" + (payMethod === "card" ? " on" : ""), "💳 Bank Kartı", function() { payMethod = "card"; render(); });
+  var b2 = mkBtn("pmb" + (payMethod === "transfer" ? " on" : ""), "🏦 Köçürmə", function() { payMethod = "transfer"; render(); });
+  add(prow, b1, b2);
+  wrap.appendChild(prow);
+
+  if (payMethod === "card") {
+    var inp = el("input");
+    inp.className = "card-inp"; inp.type = "text";
+    inp.placeholder = "**** **** **** ****"; inp.value = cardNum;
+    inp.addEventListener("input", function() { cardNum = this.value.replace(/\D/g, "").slice(0, 16); this.value = cardNum; });
+    wrap.appendChild(inp);
+  } else {
+    var ib = div("iban-box");
+    ib.innerHTML = "IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong><br>Təyinat: <strong>EV-" + STATION + "</strong>";
+    wrap.appendChild(ib);
+  }
+
+  var note = div("dep-note"); note.textContent = "ℹ️  Depozit bitərsə şarj avtomatik dayandırılacaq.";
+  wrap.appendChild(note);
+
+  var pb = mkBtn("pbtn" + (busy ? "" : ""), busy ? "🔄 Emal olunur..." : "🔒 Ödə və Başla", function() {
+    if (busy) return;
+    busy = true; render();
+    setTimeout(function() { busy = false; deposit = amt; step = 3; render(); }, 1800);
+  });
+  if (busy) pb.disabled = true;
+  wrap.appendChild(pb);
+  return wrap;
+}
+
+// ── Charging Step ──
+function startTimer() {
+  if (timer) return;
+  timer = setInterval(function() {
+    var maxKwh = deposit / TARIFF;
+    kwh += 6.8 / 3600;
+    elapsed += 1;
+    if (kwh >= maxKwh) {
+      kwh = maxKwh;
+      clearInterval(timer); timer = null;
+      finalKwh = kwh;
+      sessions.unshift({ id: "S-" + (sessions.length + 1), date: new Date().toLocaleString("az-AZ"), kwh: kwh.toFixed(2), cost: (kwh * TARIFF).toFixed(2), station: STATION });
+      step = 4; render(); return;
+    }
+    // live update without full re-render
+    var gv = document.querySelector(".g-val");
+    if (gv) gv.textContent = kwh.toFixed(2);
+    var sv = document.querySelectorAll(".s-val");
+    if (sv[0]) sv[0].textContent = fmt(elapsed);
+    if (sv[2]) sv[2].textContent = (kwh * TARIFF).toFixed(2) + " AZN";
+    var r = 72, c = 2 * Math.PI * r;
+    var pct = Math.min((kwh / maxKwh) * 100, 100);
+    var dash = c * pct / 100;
+    var color = pct < 40 ? "#22c55e" : pct < 75 ? "#f59e0b" : "#ef4444";
+    var arc = document.querySelector(".gauge-wrap circle:last-child");
+    if (arc) { arc.setAttribute("stroke-dasharray", dash + " " + c); arc.setAttribute("stroke", color); }
+  }, 1000);
+}
+
+function makeCharging() {
+  startTimer();
+  var maxKwh = deposit / TARIFF;
+  var pct = Math.min((kwh / maxKwh) * 100, 100);
+  var wrap = div(""); wrap.style.cssText = "display:flex;flex-direction:column;gap:12px";
+
+  var t = div("step-title"); t.textContent = "3. Şarj Prosesi";
+  var desc = div("step-desc"); desc.textContent = "Şarj prosesi aktivdir. Real-time məlumatları izləyin.";
+  wrap.appendChild(t); wrap.appendChild(desc);
+  wrap.appendChild(makeGauge(pct, kwh.toFixed(2), "kWh", "Şarj aktivdir"));
+
+  [["🕐", "Müddət", fmt(elapsed)], ["⚡", "Güc", "6.8 kW"], ["💰", "Cari xərc", (kwh * TARIFF).toFixed(2) + " AZN"]].forEach(function(r) {
+    var row = div("stat-row");
+    var lbl = div("s-lbl2"); lbl.textContent = r[0] + " " + r[1];
+    var val = div("s-val"); val.textContent = r[2];
+    add(row, lbl, val);
+    wrap.appendChild(row);
+  });
+
+  var stopBtn = mkBtn("pbtn red", "⏹ Şarjı Dayandır", function() {
+    clearInterval(timer); timer = null;
+    finalKwh = kwh;
+    sessions.unshift({ id: "S-" + (sessions.length + 1), date: new Date().toLocaleString("az-AZ"), kwh: kwh.toFixed(2), cost: (kwh * TARIFF).toFixed(2), station: STATION });
+    step = 4; render();
+  });
+  wrap.appendChild(stopBtn);
+  return wrap;
+}
+
+// ── Result Step ──
+function makeResult() {
+  var cost = (finalKwh * TARIFF).toFixed(2);
+  var change = (deposit - parseFloat(cost)).toFixed(2);
+  var wrap = div(""); wrap.style.cssText = "display:flex;flex-direction:column;gap:12px";
+
+  var t = div("step-title"); t.textContent = "4. Nəticə"; wrap.appendChild(t);
+  var icon = div("res-icon"); icon.textContent = "✅"; wrap.appendChild(icon);
+  var ok = div("res-ok"); ok.textContent = "Uğurlu şəkildə tamamlandı!"; wrap.appendChild(ok);
+
+  [
+    ["İstifadə olunan enerji", finalKwh.toFixed(2) + " kWh", "#1e293b"],
+    ["Ümumi xərc", cost + " AZN", "#1e293b"],
+    ["Depozit", deposit.toFixed(2) + " AZN", "#1e293b"],
+    ["Qalıq məbləğ (geri qaytarılacaq)", change + " AZN", "#16a34a"]
+  ].forEach(function(r) {
+    var row = div("res-row");
+    var lbl = div("res-lbl"); lbl.textContent = r[0];
+    var val = div("res-val"); val.textContent = r[1]; val.style.color = r[2];
+    add(row, lbl, val); wrap.appendChild(row);
+  });
+
+  wrap.appendChild(mkBtn("pbtn", "🔄 Yeni Sessiya", function() {
+    clearInterval(timer); timer = null;
+    step = 1; deposit = 0; finalKwh = 0; kwh = 0; elapsed = 0;
+    amt = 10; payMethod = "card"; cardNum = ""; busy = false;
+    nav = "new"; render();
+  }));
+  wrap.appendChild(mkBtn("pbtn ghost", "📋 Sessiyalarım", function() { nav = "sessions"; render(); }));
+  return wrap;
+}
+
+// ── Pages ──
+function makePage() {
+  var wrap = div("");
+
+  if (nav === "sessions") {
+    var t = div("page-title"); t.textContent = "Sessiyalarım"; wrap.appendChild(t);
+    if (sessions.length === 0) {
+      var e = div("empty-msg"); e.textContent = "Hələ sessiya yoxdur."; wrap.appendChild(e);
+    } else {
+      sessions.forEach(function(s) {
+        var card = div("sess-card");
+        var left = div(""); left.innerHTML = "<div style='font-weight:700;color:#1e293b'>" + s.id + "</div><div style='font-size:12px;color:#94a3b8;margin-top:2px'>" + s.date + " · " + s.station + "</div>";
+        var right = div(""); right.innerHTML = "<div style='font-weight:800;color:#6366f1;text-align:right'>" + s.kwh + " kWh</div><div style='font-size:13px;color:#64748b'>" + s.cost + " AZN</div>";
+        add(card, left, right); wrap.appendChild(card);
+      });
+    }
+    return wrap;
+  }
+
+  if (nav === "tariffs") {
+    var t = div("page-title"); t.textContent = "Tariflər"; wrap.appendChild(t);
+    [["0.30 AZN/kWh", "Standart gündüz tarifi (06:00–22:00)", "#6366f1"],
+     ["0.20 AZN/kWh", "Gecə tarifi (22:00–06:00)", "#818cf8"]].forEach(function(r) {
+      var c = div("tariff-card");
+      c.innerHTML = "<div style='font-size:26px;font-weight:900;color:" + r[2] + "'>" + r[0] + "</div><div style='color:#64748b;margin-top:4px;font-size:14px'>" + r[1] + "</div>";
+      wrap.appendChild(c);
+    });
+    return wrap;
+  }
+
+  if (nav === "stations") {
+    var t = div("page-title"); t.textContent = "Stansiyalar"; wrap.appendChild(t);
+    var c = div("tariff-card");
+    c.innerHTML = "<div style='display:flex;justify-content:space-between;align-items:flex-start'><div><div style='font-weight:800;color:#1e293b;font-size:16px'>" + STATION + "</div><div style='color:#64748b;font-size:13px;margin-top:3px'>Bakı, Nərimanov r., AzərGold, 12</div></div><div style='background:#dcfce7;color:#16a34a;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700'>Aktiv</div></div><div style='margin-top:12px;font-size:13px;color:#64748b'>Güc: 7.2 kW · GB/T AC · 24/7</div>";
+    wrap.appendChild(c);
+    return wrap;
+  }
+
+  if (nav === "about") {
+    var t = div("page-title"); t.textContent = "Haqqında"; wrap.appendChild(t);
+    var c = div("about-card");
+    c.innerHTML = "<p style='margin-bottom:8px'>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p><p style='margin-bottom:8px'>Versiya: <strong style='color:#6366f1'>1.0.0</strong></p><p>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>";
+    wrap.appendChild(c);
+    return wrap;
+  }
+
+  // New session
+  wrap.appendChild(makeSteps());
+  var card = div("card");
+  var line = div("card-top-line"); card.appendChild(line);
+
+  var content;
+  if (step === 1) content = makeQR();
+  else if (step === 2) content = makeDeposit();
+  else if (step === 3) content = makeCharging();
+  else content = makeResult();
+  card.appendChild(content);
+  wrap.appendChild(card);
+
+  var note = div("info-note");
+  note.innerHTML = "ℹ️  <span><strong>Demo:</strong> Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.</span>";
+  wrap.appendChild(note);
+  return wrap;
+}
+
+// ── Bottom Nav ──
+function makeNav() {
+  var bn = document.getElementById("bottomnav");
+  bn.innerHTML = "";
+  NAVS.forEach(function(n) {
+    var b = el("button");
+    b.className = "nb" + (nav === n.id ? " on" : "");
+    b.innerHTML = "<span class='nb-ic'>" + n.ic + "</span>" + n.lb;
+    b.addEventListener("click", function() {
+      if (n.id === "new") {
+        clearInterval(timer); timer = null;
+        step = 1; deposit = 0; finalKwh = 0; kwh = 0; elapsed = 0;
+        amt = 10; payMethod = "card"; cardNum = ""; busy = false;
+      }
+      nav = n.id; render();
+    });
+    bn.appendChild(b);
+  });
+}
+
+// ── Theme ──
+document.getElementById("theme-btn").addEventListener("click", function() {
+  var dk = document.body.classList.toggle("dark");
+  this.textContent = dk ? "☀️" : "🌙";
+  document.body.style.background = dk ? "#0f172a" : "#f1f5f9";
+  document.getElementById("topbar").style.background = "#1e293b";
+  document.getElementById("bottomnav").style.background = dk ? "#1e293b" : "#fff";
+  document.getElementById("bottomnav").style.borderTopColor = dk ? "#334155" : "#e2e8f0";
 });
-return wrap;
+
+// ── Render ──
+function render() {
+  var mc = document.getElementById("main-content");
+  mc.innerHTML = "";
+  mc.appendChild(makePage());
+  makeNav();
 }
 
-function buildQR(){
-var pat=[[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
-var ns=“http://www.w3.org/2000/svg”;
-var svg=document.createElementNS(ns,“svg”);
-svg.setAttribute(“width”,“150”);svg.setAttribute(“height”,“150”);svg.setAttribute(“viewBox”,“0 0 160 160”);
-for(var row=0;row<7;row++)for(var col=0;col<7;col++){var r=document.createElementNS(ns,“rect”);r.setAttribute(“x”,String(col*22+4));r.setAttribute(“y”,String(row*22+4));r.setAttribute(“width”,“20”);r.setAttribute(“height”,“20”);r.setAttribute(“fill”,pat[row][col]?”#1e293b”:”#f8fafc”);r.setAttribute(“rx”,“2”);svg.appendChild(r);}
-for(var i=0;i<100;i++){var rr=Math.floor(i/10),cc=i%10,x=cc*9+30,y=rr*9+30;if(x>25&&x<130&&y>25&&y<130&&!(x<60&&y<60)&&!(x>100&&y<60)&&!(x<60&&y>100)&&(rr*13+cc*7)%3===0){var sq=document.createElementNS(ns,“rect”);sq.setAttribute(“x”,String(x));sq.setAttribute(“y”,String(y));sq.setAttribute(“width”,“8”);sq.setAttribute(“height”,“8”);sq.setAttribute(“fill”,”#1e293b”);sq.setAttribute(“rx”,“1”);svg.appendChild(sq);}}
-var svgW=d(””,null,{border:“2px solid #6366f1”,borderRadius:“14px”,padding:“10px”,background:”#f8fafc”,display:“flex”,justifyContent:“center”,marginBottom:“14px”});
-svgW.appendChild(svg);
-var sIDel=d(””,null,{background:”#f1f5f9”,borderRadius:“8px”,padding:“7px 18px”,fontSize:“13px”,color:”#475569”,display:“flex”,justifyContent:“center”,marginBottom:“8px”});
-sIDel.innerHTML=“Stansiya ID: <strong style='color:#6366f1'>”+SID+”</strong>”;
-var wrap=d(””,null,{display:“flex”,flexDirection:“column”});
-wrap.appendChild(d(“section-title”,“1. QR Scan”));
-wrap.appendChild(d(“section-desc”,“Stansiya üzərindəki QR kodu skan edin və ya demo üçün düyməyə klikləyin.”));
-wrap.appendChild(svgW);
-wrap.appendChild(sIDel);
-wrap.appendChild(d(””,[“və ya”],{color:”#94a3b8”,fontSize:“12px”,textAlign:“center”,marginBottom:“8px”}));
-wrap.appendChild(btn(“pbtn”,“▶ Demo olaraq başla”,function(){set({step:2});}));
-return wrap;
-}
-
-function buildDeposit(){
-var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
-wrap.appendChild(d(“section-title”,“2. Depozit”));
-wrap.appendChild(d(“section-desc”,“Şarjə başlamaq üçün depozit məbləğini daxil edin.”));
-wrap.appendChild(d(“amt-label”,“Depozit məbləği (AZN)”));
-var disp=d(“amt-display”,String(S.amt));
-var minus=btn(“adj-btn”,“−”,function(){set({amt:Math.max(1,S.amt-1)});});
-var plus=btn(“adj-btn”,”+”,function(){set({amt:Math.min(500,S.amt+1)});});
-wrap.appendChild(d(“amt-row”,[minus,disp,plus]));
-var chips=d(“chips”);
-[5,10,20,50,100].forEach(function(a){chips.appendChild(btn(“chip”+(S.amt===a?” sel”:””),a+” AZN”,function(){set({amt:a});}));});
-wrap.appendChild(chips);
-wrap.appendChild(d(“pay-label”,“Ödəniş üsulu”));
-var pm=d(“pay-methods”);
-[[“card”,“💳 Bank Kartı”],[“transfer”,“🏦 Köçürmə”]].forEach(function(x){pm.appendChild(btn(“pay-btn”+(S.pm===x[0]?” sel”:””),x[1],function(){set({pm:x[0]});}));});
-wrap.appendChild(pm);
-if(S.pm===“card”){
-var inp=document.createElement(“input”);
-inp.className=“card-input”;inp.type=“text”;inp.placeholder=”**** **** **** ****”;inp.value=S.cn;
-inp.addEventListener(“input”,function(){S.cn=this.value.replace(/\D/g,””).slice(0,16);this.value=S.cn;});
-wrap.appendChild(inp);
-} else {
-var ib=d(“iban-box”);
-ib.innerHTML=“IBAN: <strong>AZ21 NABZ 0000 0000 1370 1000 1944</strong><br>Təyinat: <strong>EV-”+SID+”</strong>”;
-wrap.appendChild(ib);
-}
-wrap.appendChild(d(“dep-note”,“ℹ️  Depozit bitərsə şarj avtomatik dayandırılacaq.”));
-var pb=btn(“pbtn”,S.busy?“🔄 Emal olunur…”:“🔒 Ödə və Başla”,function(){
-if(S.busy)return;
-set({busy:true});
-setTimeout(function(){set({busy:false,dep:S.amt,step:3});},1800);
-},S.busy);
-if(S.busy)pb.style.background=”#a5b4fc”;
-wrap.appendChild(pb);
-return wrap;
-}
-
-function startCharge(){
-if(S.iv)return;
-var iv=setInterval(function(){
-var mk=S.dep/T,nk=S.kwh+6.8/3600;
-if(nk>=mk){
-clearInterval(S.iv);var fk=Math.min(nk,mk);
-var fc=(fk*T).toFixed(2);
-set({iv:null,kwh:fk,el:S.el+1,step:4,fkwh:fk,
-sessions:[{id:“S-”+(S.sessions.length+1),date:new Date().toLocaleString(“az-AZ”),kwh:fk.toFixed(2),cost:fc,station:SID}].concat(S.sessions)});
-return;
-}
-S.kwh=nk;S.el++;
-var gv=document.querySelector(”.gauge-val”);
-var svs=document.querySelectorAll(”.stat-val”);
-if(gv)gv.textContent=nk.toFixed(2);
-if(svs.length>=3){svs[0].textContent=fmt(S.el);svs[2].textContent=(nk*T).toFixed(2)+” AZN”;}
-var mk2=S.dep/T,p=Math.min((nk/mk2)*100,100),r=72,c=2*Math.PI*r;
-var col=p<40?”#22c55e”:p<75?”#f59e0b”:”#ef4444”;
-var arc=document.querySelector(”.gauge-wrap circle:nth-child(2)”);
-if(arc){arc.setAttribute(“stroke-dasharray”,(c*p/100)+” “+c);arc.setAttribute(“stroke”,col);}
-},1000);
-S.iv=iv;
-}
-
-function buildCharging(){
-startCharge();
-var pct=Math.min((S.kwh/(S.dep/T))*100,100);
-var cost=(S.kwh*T).toFixed(2);
-var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
-wrap.appendChild(d(“section-title”,“3. Şarj Prosesi”));
-wrap.appendChild(d(“section-desc”,“Şarj prosesi aktivdir. Real-time məlumatları izləyin.”));
-wrap.appendChild(buildGauge(pct,S.kwh.toFixed(2),“kWh”,“Şarj aktivdir”));
-[[“🕐”,“Müddət”,fmt(S.el)],[“⚡”,“Güc”,“6.8 kW”],[“💰”,“Cari xərc”,cost+” AZN”]].forEach(function(row){
-wrap.appendChild(d(“stat-row”,[d(“stat-label”,row[0]+” “+row[1]),d(“stat-val”,row[2])]));
-});
-wrap.appendChild(btn(“pbtn red”,“⏹ Şarjı Dayandır”,function(){
-clearInterval(S.iv);var fc=(S.kwh*T).toFixed(2);
-set({iv:null,step:4,fkwh:S.kwh,
-sessions:[{id:“S-”+(S.sessions.length+1),date:new Date().toLocaleString(“az-AZ”),kwh:S.kwh.toFixed(2),cost:fc,station:SID}].concat(S.sessions)});
-}));
-return wrap;
-}
-
-function buildResult(){
-var cost=(S.fkwh*T).toFixed(2),chg=(S.dep-parseFloat(cost)).toFixed(2);
-var wrap=d(””,null,{display:“flex”,flexDirection:“column”,gap:“14px”});
-wrap.appendChild(d(“section-title”,“4. Nəticə”));
-wrap.appendChild(d(“result-icon”,“✅”));
-wrap.appendChild(d(“result-ok”,“Uğurlu şəkildə tamamlandı!”));
-[[“İstifadə olunan enerji”,S.fkwh.toFixed(2)+” kWh”,”#1e293b”],[“Ümumi xərc”,cost+” AZN”,”#1e293b”],[“Depozit”,S.dep.toFixed(2)+” AZN”,”#1e293b”],[“Qalıq məbləğ (geri qaytarılacaq)”,chg+” AZN”,”#16a34a”]].forEach(function(row){
-var rr=d(“result-row”,[d(“result-label”,row[0]),d(“result-val”,row[1])]);
-rr.querySelector(”.result-val”).style.color=row[2];
-wrap.appendChild(rr);
-});
-wrap.appendChild(btn(“pbtn”,“🔄 Yeni Sessiya”,function(){
-clearInterval(S.iv);set({nav:“new”,step:1,dep:0,fkwh:0,kwh:0,el:0,amt:10,pm:“card”,cn:””,busy:false,iv:null});
-}));
-wrap.appendChild(btn(“pbtn outline”,“📋 Sessiyalarım”,function(){set({nav:“sessions”});}));
-return wrap;
-}
-
-function buildPage(){
-if(S.nav===“sessions”){
-var pg=d(””,null);pg.appendChild(d(“page-title”,“Sessiyalarım”));
-if(!S.sessions.length)pg.appendChild(d(“empty-state”,“Hələ sessiya yoxdur.”));
-else S.sessions.forEach(function(s){pg.appendChild(d(“sess-card”,[d(””,[d(“sess-id”,s.id),d(“sess-meta”,s.date+” · “+s.station)]),d(””,[d(“sess-kwh”,s.kwh+” kWh”),d(“sess-cost”,s.cost+” AZN”)])]));});
-return pg;
-}
-if(S.nav===“tariffs”){
-var pg=d(””,null);pg.appendChild(d(“page-title”,“Tariflər”));
-[[“0.30 AZN/kWh”,“Standart gündüz tarifi (06:00–22:00)”,”#6366f1”],[“0.20 AZN/kWh”,“Gecə tarifi (22:00–06:00)”,”#818cf8”]].forEach(function(r){
-var c=d(“tariff-card”,[d(“tariff-rate”,r[0]),d(“tariff-desc”,r[1])]);c.querySelector(”.tariff-rate”).style.color=r[2];pg.appendChild(c);
-});
-return pg;
-}
-if(S.nav===“stations”){
-var pg=d(””,null);pg.appendChild(d(“page-title”,“Stansiyalar”));
-pg.appendChild(d(“station-card”,[d(“station-header”,[d(””,[d(“station-name”,SID),d(“station-addr”,“Bakı, Nərimanov r., AzərGold, 12”)]),d(“active-badge”,“Aktiv”)]),d(“station-specs”,“Güc: 7.2 kW · GB/T AC · 24/7”)]));
-return pg;
-}
-if(S.nav===“about”){
-var pg=d(””,null);pg.appendChild(d(“page-title”,“Haqqında”));
-var ab=d(“about-card”);ab.innerHTML=”<p style='margin-bottom:8px'>Bu sistem elektrik avtomobillərinin şarjı üçün nəzərdə tutulmuş veb platformadır.</p><p style='margin-bottom:8px'>Versiya: <strong style='color:#6366f1'>1.0.0</strong></p><p>© 2026 MQ Charge. Bütün hüquqlar qorunur.</p>”;
-pg.appendChild(ab);return pg;
-}
-// New session
-var pg=d(””,null);
-pg.appendChild(buildSteps(S.step));
-if(mob){
-var stepContent;
-if(S.step===1)stepContent=buildQR();
-else if(S.step===2)stepContent=buildDeposit();
-else if(S.step===3)stepContent=buildCharging();
-else stepContent=buildResult();
-var card=d(“card”,[d(“card-line”),stepContent]);
-pg.appendChild(card);
-pg.appendChild(d(“info-box”,“ℹ️  Demo: Bütün məlumatlar simulyasiya olunur. Real ödəniş alınmır.”));
-} else {
-var grid=d(“grid4”);
-for(var s=1;s<=4;s++){
-var cls=“gcrd”+(S.step===s?” act”:S.step<s?” dim”:””);
-var gc=d(cls);
-if(S.step===s)gc.appendChild(d(“card-line”));
-if(s===1)gc.appendChild(buildQR());
-else if(s===2){if(S.step>=2)gc.appendChild(buildDeposit());else gc.appendChild(d(“ph”,[d(“ph-icon”,“💳”),d(“ph-title”,“2. Depozit”)]));}
-else if(s===3){if(S.step===3)gc.appendChild(buildCharging());else if(S.step>3)gc.appendChild(d(“ph”,[d(“ph-icon”,“✅”),d(“ph-title”,“Tamamlandı”)]));else gc.appendChild(d(“ph”,[d(“ph-icon”,“⚡”),d(“ph-title”,“3. Şarj Prosesi”)]));}
-else{if(S.step===4)gc.appendChild(buildResult());else gc.appendChild(d(“ph”,[d(“ph-icon”,“🏁”),d(“ph-title”,“4. Nəticə”)]));}
-grid.appendChild(gc);
-}
-pg.appendChild(grid);
-pg.appendChild(d(“demo-info”,[d(””,[“ℹ️”],{fontSize:“16px”}),d(””,[d(“di-title”,“Demo Versiya Haqqında”),d(“di-text”,“Bu sistem demo məqsədlidir. Bütün məlumatlar simulyasiya olunur.”)])]))
-}
-return pg;
-}
-
-function goNav(id){
-if(S.iv&&id!==“new”){clearInterval(S.iv);S.iv=null;}
-if(id===“new”){set({nav:“new”,step:1,dep:0,fkwh:0,kwh:0,el:0,amt:10,pm:“card”,cn:””,busy:false,iv:null});}
-else set({nav:id});
-}
-
-function R(){
-var root=document.getElementById(“app”);root.innerHTML=””;
-var dk=S.theme===“dark”;
-var app=d(“app”);if(dk)app.classList.add(“dark”);
-
-if(mob){
-var tb=d(“topbar”,[
-d(“logo”,[d(“logo-icon”,“⚡”),“MQ Charge”]),
-d(””,[ d(“tarif-badge”,“0.30 AZN/kWh”), btn(“theme-btn”,dk?“☀️”:“🌙”,function(){set({theme:dk?“light”:“dark”});}) ],{display:“flex”,gap:“10px”,alignItems:“center”})
-]);
-app.appendChild(tb);
-var ct=d(“content”);ct.appendChild(buildPage());app.appendChild(ct);
-var bn=d(“bottomnav”);
-NAVS.forEach(function(n){
-var b=d(“navbtn”+(S.nav===n.id?” active”:””),[d(“icon”,n.ic),n.lb]);
-b.addEventListener(“click”,function(){goNav(n.id);});
-bn.appendChild(b);
-});
-app.appendChild(bn);
-} else {
-var sb=d(“sidebar”);
-sb.appendChild(d(“sb-logo”,[d(“sb-logo-icon”,“⚡”),“MQ Charge”]));
-var sn=d(“sb-nav”);
-NAVS.forEach(function(n){var b=btn(“sb-btn”+(S.nav===n.id?” active”:””),n.ic+” “+n.lb,function(){goNav(n.id);});sn.appendChild(b);});
-sb.appendChild(sn);
-sb.appendChild(d(“sb-demo”,[d(“sb-demo-title”,[“🧪 “,“Demo Rejimi”]),d(“sb-demo-txt”,“Simulyasiya üzərindən işləyir. Real ödəniş alınmır.”)]));
-app.appendChild(sb);
-var dm=d(“desktop-main”);
-var thb=btn(””,dk?“☀️”:“🌙”,function(){set({theme:dk?“light”:“dark”});});thb.style.cssText=“background:none;border:none;cursor:pointer;font-size:18px;”;
-var hdr=d(“dsk-header”,[d(“demo-badge”,“🧪 Demo Mode”),d(“hdr-right”,[d(“hdr-tarif”,[“Tarif: “,h(“strong”,””,[“0.30 AZN / kWh”],{color:”#6366f1”})]),thb,d(“lang-badge”,“🌐 AZ”)])]);
-dm.appendChild(hdr);
-var ct2=d(“content”);ct2.appendChild(buildPage());dm.appendChild(ct2);
-dm.appendChild(d(“dsk-footer”,“© 2026 MQ Charge. Bütün hüquqlar qorunur. ♡”));
-app.appendChild(dm);
-}
-root.appendChild(app);
-}
-R();
+// ── Init ──
+render();
 </script>
-
 </body>
 </html>
